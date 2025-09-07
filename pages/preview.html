@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burme Mark - Preview</title>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/pages/preview.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img">
+                    <i class="fas fa-robot"></i>
+                </div>
+                Burme Mark
+            </a>
+            
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item"><a href="mainchat.html" class="nav-link">Chat</a></li>
+                <li class="nav-item"><a href="text_generate.html" class="nav-link">Text Generate</a></li>
+                <li class="nav-item"><a href="image_generate.html" class="nav-link">Image Generate</a></li>
+                <li class="nav-item"><a href="coder.html" class="nav-link">Coder</a></li>
+                <li class="nav-item"><a href="preview.html" class="nav-link active">Preview</a></li>
+                <li class="nav-item"><a href="docs.html" class="nav-link">Docs</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="preview-container">
+        <div class="preview-header">
+            <h1>Content Preview</h1>
+            <p>Review and manage your generated content</p>
+        </div>
+
+        <div class="preview-tabs">
+            <button class="tab-btn active" data-tab="text">Text Content</button>
+            <button class="tab-btn" data-tab="images">Generated Images</button>
+            <button class="tab-btn" data-tab="code">Code Snippets</button>
+        </div>
+
+        <div class="tab-content active" id="text-tab">
+            <div class="content-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search text content...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-options">
+                    <select>
+                        <option>All Types</option>
+                        <option>Articles</option>
+                        <option>Social Media</option>
+                        <option>Emails</option>
+                        <option>Creative Writing</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-items">
+                <div class="text-item">
+                    <div class="item-header">
+                        <h3>Introduction to AI Technology</h3>
+                        <span class="item-date">Today, 10:30 AM</span>
+                    </div>
+                    <p class="item-preview">Artificial Intelligence has transformed how we interact with technology in recent years...</p>
+                    <div class="item-actions">
+                        <button class="action-btn view-btn">View Full</button>
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn copy-btn">Copy</button>
+                        <button class="action-btn delete-btn">Delete</button>
+                    </div>
+                </div>
+
+                <div class="text-item">
+                    <div class="item-header">
+                        <h3>Social Media Post - Product Launch</h3>
+                        <span class="item-date">Yesterday, 3:45 PM</span>
+                    </div>
+                    <p class="item-preview">We're excited to announce our new product line! 🎉 Get ready for something amazing...</p>
+                    <div class="item-actions">
+                        <button class="action-btn view-btn">View Full</button>
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn copy-btn">Copy</button>
+                        <button class="action-btn delete-btn">Delete</button>
+                    </div>
+                </div>
+
+                <div class="text-item">
+                    <div class="item-header">
+                        <h3>Weekly Newsletter</h3>
+                        <span class="item-date">Oct 12, 2023</span>
+                    </div>
+                    <p class="item-preview">Hello subscribers, welcome to our weekly update! Here's what's new this week...</p>
+                    <div class="item-actions">
+                        <button class="action-btn view-btn">View Full</button>
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn copy-btn">Copy</button>
+                        <button class="action-btn delete-btn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="images-tab">
+            <div class="content-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search images...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-options">
+                    <select>
+                        <option>All Styles</option>
+                        <option>Realistic</option>
+                        <option>Anime</option>
+                        <option>Digital Art</option>
+                        <option>Oil Painting</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="image-gallery">
+                <div class="gallery-item">
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="image-info">
+                        <h4>Mountain Landscape</h4>
+                        <p>Realistic • 768×768</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="image-info">
+                        <h4>Cyberpunk City</h4>
+                        <p>Digital Art • 1024×1024</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="image-info">
+                        <h4>Fantasy Character</h4>
+                        <p>Anime • 512×512</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="code-tab">
+            <div class="content-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search code...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-options">
+                    <select>
+                        <option>All Languages</option>
+                        <option>Python</option>
+                        <option>JavaScript</option>
+                        <option>Java</option>
+                        <option>HTML/CSS</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="code-items">
+                <div class="code-item">
+                    <div class="item-header">
+                        <h3>API Request Handler</h3>
+                        <span class="item-lang">Python</span>
+                    </div>
+                    <pre><code>import requests
+
+def fetch_data(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        return None</code></pre>
+                    <div class="item-actions">
+                        <button class="action-btn view-btn">View Full</button>
+                        <button class="action-btn copy-btn">Copy Code</button>
+                        <button class="action-btn delete-btn">Delete</button>
+                    </div>
+                </div>
+
+                <div class="code-item">
+                    <div class="item-header">
+                        <h3>Sorting Algorithm</h3>
+                        <span class="item-lang">JavaScript</span>
+                    </div>
+                    <pre><code>function quickSort(arr) {
+  if (arr.length <= 1) return arr;
+  
+  const pivot = arr[arr.length - 1];
+  const left = [];
+  const right = [];
+  
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] < pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+  
+  return [...quickSort(left), pivot, ...quickSort(right)];
+}</code></pre>
+                    <div class="item-actions">
+                        <button class="action-btn view-btn">View Full</button>
+                        <button class="action-btn copy-btn">Copy Code</button>
+                        <button class="action-btn delete-btn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/navbar.js"></script>
+    <script src="../js/pages/preview.js"></script>
+</body>
+  </html>
