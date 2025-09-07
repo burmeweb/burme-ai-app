@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burme Mark - AI Chat</title>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/pages/mainchat.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img">
+                    <i class="fas fa-robot"></i>
+                </div>
+                Burme Mark
+            </a>
+            
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item"><a href="mainchat.html" class="nav-link active">Chat</a></li>
+                <li class="nav-item"><a href="text_generate.html" class="nav-link">Text Generate</a></li>
+                <li class="nav-item"><a href="image_generate.html" class="nav-link">Image Generate</a></li>
+                <li class="nav-item"><a href="coder.html" class="nav-link">Coder</a></li>
+                <li class="nav-item"><a href="docs.html" class="nav-link">Docs</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="chat-container">
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <h3>Chat History</h3>
+                <button class="new-chat-btn">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+            </div>
+            <div class="chat-history">
+                <div class="chat-item active">
+                    <i class="fas fa-message"></i>
+                    <span>Welcome to Burme Mark</span>
+                </div>
+                <div class="chat-item">
+                    <i class="fas fa-message"></i>
+                    <span>How to use AI assistant</span>
+                </div>
+                <div class="chat-item">
+                    <i class="fas fa-message"></i>
+                    <span>Programming help</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello! I'm Burme Mark, your AI assistant. How can I help you today?</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input">
+                    <textarea placeholder="Type your message here..." rows="1"></textarea>
+                    <button class="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="chat-options">
+                    <button class="option-btn">
+                        <i class="fas fa-image"></i> Image
+                    </button>
+                    <button class="option-btn">
+                        <i class="fas fa-code"></i> Code
+                    </button>
+                    <button class="option-btn">
+                        <i class="fas fa-magic"></i> Suggest
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/navbar.js"></script>
+    <script src="../js/pages/mainchat.js"></script>
+</body>
+</html>
