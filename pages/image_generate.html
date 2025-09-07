@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burme Mark - Image Generate</title>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/pages/image_generate.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img">
+                    <i class="fas fa-robot"></i>
+                </div>
+                Burme Mark
+            </a>
+            
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item"><a href="mainchat.html" class="nav-link">Chat</a></li>
+                <li class="nav-item"><a href="text_generate.html" class="nav-link">Text Generate</a></li>
+                <li class="nav-item"><a href="image_generate.html" class="nav-link active">Image Generate</a></li>
+                <li class="nav-item"><a href="coder.html" class="nav-link">Coder</a></li>
+                <li class="nav-item"><a href="docs.html" class="nav-link">Docs</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="image-generate-container">
+        <div class="generate-header">
+            <h1>AI Image Generation</h1>
+            <p>Create stunning images from text descriptions</p>
+        </div>
+
+        <div class="generate-controls">
+            <div class="control-group">
+                <label for="prompt-input">Image Description</label>
+                <textarea id="prompt-input" placeholder="Describe the image you want to generate..."></textarea>
+            </div>
+            
+            <div class="style-options">
+                <h3>Art Style</h3>
+                <div class="style-buttons">
+                    <button class="style-btn">Realistic</button>
+                    <button class="style-btn">Anime</button>
+                    <button class="style-btn">Digital Art</button>
+                    <button class="style-btn">Oil Painting</button>
+                    <button class="style-btn">Sketch</button>
+                </div>
+            </div>
+            
+            <div class="size-options">
+                <h3>Image Size</h3>
+                <div class="size-buttons">
+                    <button class="size-btn">512×512</button>
+                    <button class="size-btn active">768×768</button>
+                    <button class="size-btn">1024×1024</button>
+                </div>
+            </div>
+            
+            <button class="generate-image-btn">
+                <i class="fas fa-wand-magic-sparkles"></i> Generate Image
+            </button>
+        </div>
+
+        <div class="output-gallery">
+            <h3>Generated Images</h3>
+            <div class="gallery-container">
+                <div class="gallery-item">
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Your generated images will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/navbar.js"></script>
+    <script src="../js/pages/image_generate.js"></script>
+</body>
+</html>
