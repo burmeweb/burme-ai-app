@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burme Mark - AI Chat</title>
     <link rel="icon" href="../assets/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/navbar.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/pages/mainchat.css">
@@ -14,7 +15,7 @@
         <div class="nav-container">
             <a href="../index.html" class="logo">
                 <div class="logo-img">
-                    <i class="fa-robot"></i>
+                    <img src="../assets/logo.png" alt="Burme Mark Logo">
                 </div>
                 Burme Mark
             </a>
@@ -37,31 +38,51 @@
         <div class="chat-sidebar">
             <div class="sidebar-header">
                 <h3>Chat History</h3>
-                <button class="new-chat-btn">
+                <button class="new-chat-btn" id="newChatBtn">
                     <i class="fas fa-plus"></i> New Chat
                 </button>
             </div>
-            <div class="chat-history">
-                <div class="chat-item active">
+            <div class="chat-history" id="chatHistory">
+                <div class="chat-item active" data-chat-id="welcome">
                     <i class="fas fa-message"></i>
                     <span>Welcome to Burme Mark</span>
+                    <button class="delete-chat-btn"><i class="fas fa-trash"></i></button>
                 </div>
-                <div class="chat-item">
+                <div class="chat-item" data-chat-id="help">
                     <i class="fas fa-message"></i>
                     <span>How to use AI assistant</span>
+                    <button class="delete-chat-btn"><i class="fas fa-trash"></i></button>
                 </div>
-                <div class="chat-item">
+                <div class="chat-item" data-chat-id="programming">
                     <i class="fas fa-message"></i>
                     <span>Programming help</span>
+                    <button class="delete-chat-btn"><i class="fas fa-trash"></i></button>
                 </div>
+            </div>
+            <div class="sidebar-footer">
+                <button class="clear-history-btn" id="clearHistoryBtn">
+                    <i class="fas fa-trash"></i> Clear History
+                </button>
             </div>
         </div>
 
         <div class="chat-main">
-            <div class="chat-messages">
+            <div class="chat-header">
+                <h2>AI Assistant Chat</h2>
+                <div class="chat-actions">
+                    <button class="action-btn" id="exportChatBtn" title="Export Chat">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-btn" id="settingsBtn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
                 <div class="message ai-message">
                     <div class="message-avatar">
-                        <i class="fas fa-robot"></i>
+                        <img src="../assets/logo.png" alt="AI Avatar">
                     </div>
                     <div class="message-content">
                         <p>Hello! I'm Burme Mark, your AI assistant. How can I help you today?</p>
@@ -71,20 +92,40 @@
             </div>
 
             <div class="chat-input-container">
+                <div class="upload-preview" id="uploadPreview"></div>
+                
+                <div class="chat-input-controls">
+                    <button class="input-btn voice-btn" id="voiceBtn" title="Voice Input">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="input-btn upload-btn" id="uploadBtn" title="Upload Files">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="input-btn camera-btn" id="cameraBtn" title="Take Photo">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="fileInput" multiple accept="image/*,video/*,.txt,.pdf,.doc,.docx" style="display: none;">
+                    <input type="file" id="cameraInput" accept="image/*" capture="camera" style="display: none;">
+                </div>
+
                 <div class="chat-input">
-                    <textarea placeholder="Type your message here..." rows="1"></textarea>
-                    <button class="send-btn">
+                    <textarea id="messageInput" placeholder="Type your message here..." rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
+                    <button class="stop-btn" id="stopBtn" style="display: none;">
+                        <i class="fas fa-stop"></i>
+                    </button>
                 </div>
+
                 <div class="chat-options">
-                    <button class="option-btn">
+                    <button class="option-btn" data-prompt="Generate an image of">
                         <i class="fas fa-image"></i> Image
                     </button>
-                    <button class="option-btn">
+                    <button class="option-btn" data-prompt="Write code for">
                         <i class="fas fa-code"></i> Code
                     </button>
-                    <button class="option-btn">
+                    <button class="option-btn" data-prompt="Suggest some ideas for">
                         <i class="fas fa-magic"></i> Suggest
                     </button>
                 </div>
@@ -92,7 +133,45 @@
         </div>
     </main>
 
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chat Settings</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>AI Model</label>
+                    <select id="aiModelSelect">
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gpt-3.5" selected>GPT-3.5 Turbo</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Voice Input</label>
+                    <select id="voiceInputSelect">
+                        <option value="en-US">English (US)</option>
+                        <option value="en-GB">English (UK)</option>
+                        <option value="fr-FR">French</option>
+                        <option value="de-DE">German</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Theme</label>
+                    <select id="themeSelect">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="auto">Auto</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/navbar.js"></script>
+    <script src="../js/worker.js"></script>
     <script src="../js/pages/mainchat.js"></script>
 </body>
-</html>
+                            </html>
