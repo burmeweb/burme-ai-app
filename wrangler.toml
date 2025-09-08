@@ -1,0 +1,18 @@
+name = "burme-mark-chatbot"
+compatibility_date = "2024-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[routes]]
+pattern = "burmemark-worker.mysvm.workers.dev/*"
+custom_domain = true
+
+# Add environment variables for API keys (if using real AI services)
+[vars]
+OPENAI_API_KEY = "@openai_api_key"
+STABILITY_API_KEY = "@stability_api_key"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
