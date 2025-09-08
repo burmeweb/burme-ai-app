@@ -2,30 +2,19 @@
 name = 'burmemark-worker'
 compatibility_date = "2024-05-01"
 compatibility_flags = ["nodejs_compat"]
-main = "../index.js"  # ဒီလိုင်းကို ထည့်ပါ
+main = "src/index.js"
 
 # Routes configuration
 [[routes]]
-pattern = "burmemark-worker.mysvm.workers.dev/*"
+pattern = "api.burmemark-worker.mysvm.workers.dev/*"
 custom_domain = true
 
-# Add environment variables for API keys (if using real AI services)
 [vars]
 OPENAI_API_KEY = "@openai_api_key"
 STABILITY_API_KEY = "@stability_api_key"
-
-# For serving static assets
-[site]
-bucket = "./public"
-entry-point = "src"
 
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
 [env.staging]
 vars = { ENVIRONMENT = "staging" }
-compatibility_date = "2024-05-01"
-
-[[routes]]
-pattern = "burmemark-worker.mysvm.workers.dev"
-custom_domain = true
