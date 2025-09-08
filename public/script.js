@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let uploadedFilesList = [];
     
     // API Base URL - Cloudflare Worker URL
-    const API_BASE = 'https://burmemark-worker.mysvm.workers.dev';
+    const API_BASE = 'https://burmemark-worker.mysvm.workers.dev/';
     
     // Event Listeners
     sendButton.addEventListener('click', sendMessage);
