@@ -1,140 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="my">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burme Mark </title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            overflow: hidden;
-        }
-        
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .loader-container {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            max-width: 90%;
-            width: 400px;
-        }
-        
-        .logo {
-            margin-bottom: 1.5rem;
-        }
-        
-        .logo-icon {
-            font-size: 4rem;
-            margin-bottom: 0.5rem;
-            color: #fdbb2d;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        
-        .tagline {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-        
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: #fdbb2d;
-            border-radius: 4px;
-            animation: loading 2.5s ease-in-out forwards;
-        }
-        
-        @keyframes loading {
-            0% { width: 0%; }
-            20% { width: 20%; }
-            50% { width: 50%; }
-            80% { width: 80%; }
-            100% { width: 100%; }
-        }
-        
-        .loading-text {
-            font-size: 1rem;
-            letter-spacing: 1px;
-        }
-        
-        .dots {
-            display: inline-block;
-        }
-        
-        .dots::after {
-            content: '';
-            animation: dots 1.5s infinite;
-        }
-        
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Burme Mark - AI-Powered Toolbox</title>
+  <style>
+    /* Custom advanced styles */
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #10b981;
+      --dark: #1f2937;
+      --light: #f9fafb;
+      --accent: #f59e0b;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: var(--light);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+    }
+    
+    .page-bg {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .center-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      max-width: 500px;
+      width: 100%;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+      animation: float 6s ease-in-out infinite;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 15px 0;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .links a {
+      display: block;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .links a:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+    
+    .links a:hover:before {
+      left: 100%;
+    }
+    
+    .links a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .center-card {
+        padding: 30px 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      p {
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
-<body>
-    <div class="loader-container">
-        <div class="logo">
-            <div class="logo-icon">🤖</div>
-            <h1>Burme Mark</h1>
-            <p class="tagline">Your AI Powered Creative Suite</p>
-        </div>
-        
-        <div class="progress-container">
-            <div class="progress-bar"></div>
-        </div>
-        
-        <p class="loading-text">Loading<span class="dots"></span></p>
-    </div>
-
-    <script>
-        // Redirect to main page after 3 seconds
-        setTimeout(() => {
-            window.location.href = '../pages/dashboard.html';
-        }, 3000);
-        
-        // Optional: Redirect immediately if user clicks
-        document.addEventListener('click', () => {
-            window.location.href = '../main/pages/dashboard.html';
-        });
-    </script>
+<body class="page-bg">
+  <main class="center-card">
+    <img src="assets/logo.png" alt="Burme Mark" class="logo"/>
+    <h1>Burme Mark</h1>
+    <p>AI-powered toolbox — Chat, Text Gen, Image Gen, Code Gen.</p>
+  
+  </main>
 </body>
 </html>
