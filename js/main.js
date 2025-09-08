@@ -1,321 +1,421 @@
-// Global JavaScript for Burme Mark App
+// js/main.js
+
+// Global variables
+let currentPage = 'mainchat';
+let currentTheme = 'light';
+let apiEndpoint = 'https://api.burmemark.com/v1';
+let userPreferences = {
+    theme: 'light',
+    fontSize: 'medium',
+    autoSave: true,
+    notifications: true
+};
+
+// DOM Content Loaded Event
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile navigation toggle
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navMenu = document.getElementById('navMenu');
-    
-    if (mobileToggle && navMenu) {
-        mobileToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            mobileToggle.innerHTML = navMenu.classList.contains('active') ? 
-                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-        });
-        
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            });
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav-container') && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-        });
-    }
-    
-    // Animation on scroll
-    const animateOnScroll = function() {
-        const elements = document.querySelectorAll('.animated');
-        elements.forEach(element => {
-            const elementPosition = element.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight / 1.3;
-            
-            if (elementPosition < screenPosition) {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }
-        });
-    };
-    
-    // Initialize animations
-    window.addEventListener('scroll', animateOnScroll);
-    animateOnScroll(); // Trigger on load
-    
-    // Theme handling (light/dark mode)
-    const themeToggle = document.createElement('button');
-    themeToggle.id = 'themeToggle';
-    themeToggle.className = 'theme-toggle';
-    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    themeToggle.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: var(--primary);
-        color: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        z-index: 99;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    `;
-    
-    document.body.appendChild(themeToggle);
-    
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        const isLightTheme = document.body.classList.contains('light-theme');
-        localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
-        
-        themeToggle.innerHTML = isLightTheme ? 
-            '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        
-        // Update theme variables
-        updateThemeVariables(isLightTheme);
-    });
-    
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-theme');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        updateThemeVariables(true);
-    }
-    
-    function updateThemeVariables(isLightTheme) {
-        if (isLightTheme) {
-            document.documentElement.style.setProperty('--light', '#212529');
-            document.documentElement.style.setProperty('--dark', '#f8f9fa');
-            document.documentElement.style.setProperty('--text', '#f8f9fa');
-            document.documentElement.style.setProperty('--text-light', '#6c757d');
-            document.body.style.background = 'linear-gradient(135deg, #e6e6e6 0%, #ffffff 100%)';
-            document.body.style.color = '#212529';
-        } else {
-            document.documentElement.style.setProperty('--light', '#f8f9fa');
-            document.documentElement.style.setProperty('--dark', '#212529');
-            document.documentElement.style.setProperty('--text', '#2b2d42');
-            document.documentElement.style.setProperty('--text-light', '#6c757d');
-            document.body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)';
-            document.body.style.color = '#f8f9fa';
-        }
-    }
-    
-    // Handle API errors globally
-    window.handleApiError = function(error) {
-        console.error('API Error:', error);
-        showNotification('An error occurred. Please try again.', 'error');
-    };
-    
-    // Global notification function
-    window.showNotification = function(message, type = 'info') {
-        // Remove existing notifications
-        document.querySelectorAll('.notification').forEach(n => n.remove());
-        
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <span>${message}</span>
-            <button onclick="this.parentElement.remove()">&times;</button>
-        `;
-        
-        // Add styles if not already added
-        if (!document.getElementById('notification-styles')) {
-            const styles = document.createElement('style');
-            styles.id = 'notification-styles';
-            styles.textContent = `
-                .notification {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 15px 20px;
-                    border-radius: 5px;
-                    color: white;
-                    z-index: 1000;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    min-width: 300px;
-                    max-width: 500px;
-                    animation: slideIn 0.3s ease;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                }
-                .notification.success { background: #4caf50; }
-                .notification.error { background: #f44336; }
-                .notification.info { background: #2196f3; }
-                .notification.warning { background: #ff9800; }
-                .notification button {
-                    background: none;
-                    border: none;
-                    color: white;
-                    font-size: 20px;
-                    cursor: pointer;
-                    margin-left: 15px;
-                }
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(styles);
-        }
-        
-        document.body.appendChild(notification);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (notification.parentElement) {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }
-        }, 5000);
-    };
-    
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-    
-    // Lazy loading for images
-    if ('IntersectionObserver' in window) {
-        const lazyImageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const lazyImage = entry.target;
-                    if (lazyImage.dataset.src) {
-                        lazyImage.src = lazyImage.dataset.src;
-                    }
-                    if (lazyImage.dataset.srcset) {
-                        lazyImage.srcset = lazyImage.dataset.srcset;
-                    }
-                    lazyImage.classList.remove('lazy');
-                    lazyImageObserver.unobserve(lazyImage);
-                }
-            });
-        });
-        
-        document.querySelectorAll('img.lazy').forEach(img => {
-            lazyImageObserver.observe(img);
-        });
-    }
-    
-    // Add loading animation to buttons
-    document.addEventListener('click', function(e) {
-        if (e.target.matches('.btn, button') && !e.target.classList.contains('theme-toggle')) {
-            const button = e.target;
-            const originalText = button.innerHTML;
-            
-            // Only add loading animation if the button doesn't already have it
-            if (!button.classList.contains('loading')) {
-                button.classList.add('loading');
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-                button.disabled = true;
-                
-                // Auto reset after 5 seconds (safety measure)
-                setTimeout(() => {
-                    if (button.classList.contains('loading')) {
-                        button.classList.remove('loading');
-                        button.innerHTML = originalText;
-                        button.disabled = false;
-                    }
-                }, 5000);
-            }
-        }
-    });
-    
-    // Page transition animation
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Only apply to internal links
-            if (this.hostname === window.location.hostname && !this.hash) {
-                e.preventDefault();
-                const href = this.href;
-                
-                // Add page transition
-                document.body.style.opacity = '0';
-                document.body.style.transition = 'opacity 0.3s ease';
-                
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 300);
-            }
-        });
-    });
-    
-    // Check if page was loaded from cache and restore opacity
-    if (document.body.style.opacity === '0') {
-        document.body.style.opacity = '1';
-    }
-    
-    // Add keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + K to focus search (if available)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.querySelector('input[type="search"], input[placeholder*="earch"]');
-            if (searchInput) {
-                searchInput.focus();
-            }
-        }
-        
-        // Escape key to close modals or menus
-        if (e.key === 'Escape') {
-            // Close mobile menu if open
-            if (navMenu && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-            
-            // Close notifications
-            document.querySelectorAll('.notification').forEach(n => n.remove());
-        }
-    });
-    
-    // Performance monitoring
-    if ('performance' in window) {
-        window.addEventListener('load', function() {
-            const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-            console.log(`Page loaded in ${loadTime}ms`);
-            
-            if (loadTime > 3000) {
-                console.warn('Page load time is slow. Consider optimizing assets.');
-            }
-        });
-    }
-    
-    // Service Worker registration (for PWA)
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                    console.log('SW registered: ', registration);
-                })
-                .catch(function(registrationError) {
-                    console.log('SW registration failed: ', registrationError);
-                });
-        });
-    }
+    initializeApplication();
+    setupEventListeners();
+    loadUserPreferences();
 });
+
+/**
+ * Initialize the application
+ */
+function initializeApplication() {
+    console.log('Burme-Mark Application Initializing...');
+    
+    // Apply saved theme
+    applyTheme(userPreferences.theme);
+    
+    // Check if user is logged in (placeholder for future implementation)
+    checkAuthStatus();
+    
+    // Initialize service worker if available
+    if ('serviceWorker' in navigator) {
+        initializeServiceWorker();
+    }
+    
+    // Load initial page content
+    loadPageContent(currentPage);
+}
+
+/**
+ * Set up global event listeners
+ */
+function setupEventListeners() {
+    // Navigation events
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('[data-nav]')) {
+            e.preventDefault();
+            const page = e.target.getAttribute('data-nav');
+            navigateTo(page);
+        }
+    });
+    
+    // Theme toggle
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('#themeToggle')) {
+            toggleTheme();
+        }
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + / for help
+        if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+            e.preventDefault();
+            navigateTo('docs');
+        }
+        
+        // Escape key to clear selection/close modals
+        if (e.key === 'Escape') {
+            clearSelection();
+        }
+    });
+    
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(e) {
+        if (e.state && e.state.page) {
+            loadPageContent(e.state.page);
+        }
+    });
+}
+
+/**
+ * Navigate to a different page
+ * @param {string} page - The page to navigate to
+ */
+function navigateTo(page) {
+    if (page === currentPage) return;
+    
+    // Save current page state (placeholder for future implementation)
+    savePageState(currentPage);
+    
+    // Update current page
+    currentPage = page;
+    
+    // Update browser history
+    window.history.pushState({ page }, '', `pages/${page}.html`);
+    
+    // Load new page content
+    loadPageContent(page);
+    
+    // Update active navigation
+    updateActiveNav(page);
+}
+
+/**
+ * Load content for a specific page
+ * @param {string} page - The page to load
+ */
+function loadPageContent(page) {
+    console.log(`Loading page: ${page}`);
+    
+    // Show loading indicator
+    showLoading();
+    
+    // Fetch page content
+    fetch(`pages/${page}.html`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load page: ${page}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Insert content into main container
+            document.getElementById('main-content').innerHTML = html;
+            
+            // Load page-specific JavaScript
+            loadPageScript(page);
+            
+            // Hide loading indicator
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Error loading page:', error);
+            showError(`Failed to load ${page} page. Please try again.`);
+            hideLoading();
+        });
+}
+
+/**
+ * Load page-specific JavaScript
+ * @param {string} page - The page to load script for
+ */
+function loadPageScript(page) {
+    // Remove any previously loaded page script
+    const existingScript = document.getElementById('page-script');
+    if (existingScript) {
+        existingScript.remove();
+    }
+    
+    // Create new script element
+    const script = document.createElement('script');
+    script.id = 'page-script';
+    script.src = `js/pages/${page}.js`;
+    script.onerror = function() {
+        console.warn(`No script found for ${page} page`);
+        this.remove();
+    };
+    
+    document.body.appendChild(script);
+}
+
+/**
+ * Toggle between light and dark themes
+ */
+function toggleTheme() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    applyTheme(currentTheme);
+    
+    // Save preference
+    userPreferences.theme = currentTheme;
+    saveUserPreferences();
+}
+
+/**
+ * Apply the selected theme
+ * @param {string} theme - The theme to apply ('light' or 'dark')
+ */
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    currentTheme = theme;
+    
+    // Update theme toggle button if it exists
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+        themeToggle.setAttribute('aria-label', 
+            `Switch to ${theme === 'light' ? 'dark' : 'light'} mode`);
+    }
+}
+
+/**
+ * Show loading indicator
+ */
+function showLoading() {
+    // Create or show loading overlay
+    let loadingOverlay = document.getElementById('loading-overlay');
+    if (!loadingOverlay) {
+        loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
+        `;
+        document.body.appendChild(loadingOverlay);
+    }
+    
+    loadingOverlay.style.display = 'flex';
+}
+
+/**
+ * Hide loading indicator
+ */
+function hideLoading() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+/**
+ * Show error message
+ * @param {string} message - The error message to display
+ */
+function showError(message) {
+    // Create or update error toast
+    let errorToast = document.getElementById('error-toast');
+    if (!errorToast) {
+        errorToast = document.createElement('div');
+        errorToast.id = 'error-toast';
+        errorToast.innerHTML = `
+            <div class="error-content">
+                <span class="error-message"></span>
+                <button class="error-close">×</button>
+            </div>
+        `;
+        document.body.appendChild(errorToast);
+        
+        // Add close event listener
+        errorToast.querySelector('.error-close').addEventListener('click', function() {
+            errorToast.classList.remove('active');
+        });
+    }
+    
+    errorToast.querySelector('.error-message').textContent = message;
+    errorToast.classList.add('active');
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        errorToast.classList.remove('active');
+    }, 5000);
+}
+
+/**
+ * Clear current selection or close modals
+ */
+function clearSelection() {
+    // Clear any text selection
+    if (window.getSelection) {
+        window.getSelection().removeAllRanges();
+    }
+    
+    // Close any open modals (implementation depends on your modal system)
+    const modals = document.querySelectorAll('.modal.show');
+    modals.forEach(modal => {
+        // You would typically have a function to close modals
+        // For now, we'll just remove a show class if it exists
+        modal.classList.remove('show');
+    });
+}
+
+/**
+ * Update active navigation item
+ * @param {string} page - The current active page
+ */
+function updateActiveNav(page) {
+    // Remove active class from all nav items
+    const navItems = document.querySelectorAll('[data-nav]');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to current nav item
+    const currentNavItem = document.querySelector(`[data-nav="${page}"]`);
+    if (currentNavItem) {
+        currentNavItem.classList.add('active');
+    }
+}
+
+/**
+ * Load user preferences from localStorage
+ */
+function loadUserPreferences() {
+    const savedPreferences = localStorage.getItem('burmemark-preferences');
+    if (savedPreferences) {
+        try {
+            userPreferences = { ...userPreferences, ...JSON.parse(savedPreferences) };
+            
+            // Apply preferences
+            if (userPreferences.theme) {
+                applyTheme(userPreferences.theme);
+            }
+            
+            if (userPreferences.fontSize) {
+                document.documentElement.style.fontSize = 
+                    userPreferences.fontSize === 'small' ? '14px' :
+                    userPreferences.fontSize === 'large' ? '18px' : '16px';
+            }
+        } catch (e) {
+            console.error('Error parsing saved preferences:', e);
+        }
+    }
+}
+
+/**
+ * Save user preferences to localStorage
+ */
+function saveUserPreferences() {
+    try {
+        localStorage.setItem('burmemark-preferences', JSON.stringify(userPreferences));
+    } catch (e) {
+        console.error('Error saving preferences:', e);
+    }
+}
+
+/**
+ * Initialize service worker for offline functionality
+ */
+function initializeServiceWorker() {
+    navigator.serviceWorker.register('/worker/worker.js')
+        .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        })
+        .catch(error => {
+            console.log('ServiceWorker registration failed: ', error);
+        });
+}
+
+/**
+ * Check authentication status (placeholder for future implementation)
+ */
+function checkAuthStatus() {
+    // This would check if the user is logged in
+    // For now, we'll just set a placeholder
+    const isLoggedIn = localStorage.getItem('burmemark-auth-token') !== null;
+    window.userAuthenticated = isLoggedIn;
+    
+    // Dispatch custom event for other components to listen to
+    document.dispatchEvent(new CustomEvent('authStatusChanged', { 
+        detail: { isAuthenticated: isLoggedIn } 
+    }));
+}
+
+/**
+ * Save current page state (placeholder for future implementation)
+ * @param {string} page - The page to save state for
+ */
+function savePageState(page) {
+    // This would save the state of the current page before navigating away
+    // For example, saving form data, scroll position, etc.
+    
+    // Dispatch custom event for page-specific save handlers
+    document.dispatchEvent(new CustomEvent('pageBeforeUnload', { 
+        detail: { page } 
+    }));
+}
+
+/**
+ * Make API request to backend
+ * @param {string} endpoint - API endpoint
+ * @param {object} options - Fetch options
+ * @returns {Promise} - Fetch promise
+ */
+function apiRequest(endpoint, options = {}) {
+    const url = `${apiEndpoint}${endpoint}`;
+    
+    // Set default headers
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+    };
+    
+    // Add auth token if available
+    const authToken = localStorage.getItem('burmemark-auth-token');
+    if (authToken) {
+        defaultHeaders['Authorization'] = `Bearer ${authToken}`;
+    }
+    
+    // Merge headers
+    options.headers = { ...defaultHeaders, ...options.headers };
+    
+    // Show loading indicator for requests that take time
+    if (!options.silent) {
+        showLoading();
+    }
+    
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .finally(() => {
+            if (!options.silent) {
+                hideLoading();
+            }
+        });
+}
+
+// Export functions for use in other modules (if using modules)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        navigateTo,
+        toggleTheme,
+        apiRequest,
+        showError,
+        userPreferences
+    };
+}
