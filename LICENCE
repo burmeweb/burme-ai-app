@@ -1,0 +1,13 @@
+
+## GitHub Repository တည်ဆောက်နည်း
+
+1. GitHub သို့ ဝင်ရောက်ပြီး new repository တစ်ခုကို "burme-mark-chatbot" အမည်ဖြင့် ဖန်တီးပါ။
+2. ဖော်ပြထားသော ဖိုင်များကို သင့်စက်တွင် ဖန်တီးပါ။
+3. Git commands များဖြင့် repository သို့ ထည့်သွင်းပါ:
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/your-username/burme-mark-chatbot.git
+git push -u origin main
