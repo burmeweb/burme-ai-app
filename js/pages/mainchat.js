@@ -1,580 +1,256 @@
-// Main Chat Page JavaScript with Advanced Features
+// js/pages/mainchat.js
+
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const voiceBtn = document.getElementById('voiceBtn');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const cameraBtn = document.getElementById('cameraBtn');
-    const fileInput = document.getElementById('fileInput');
-    const cameraInput = document.getElementById('cameraInput');
-    const uploadPreview = document.getElementById('uploadPreview');
-    const chatMessages = document.getElementById('chatMessages');
-    const chatHistory = document.getElementById('chatHistory');
-    const newChatBtn = document.getElementById('newChatBtn');
-    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const exportChatBtn = document.getElementById('exportChatBtn');
-    const settingsModal = document.getElementById('settingsModal');
-    const closeModalBtn = document.querySelector('.close-btn');
-
-    // State variables
-    let isRecording = false;
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    const generateBtn = document.getElementById('generate-btn');
+    const uploadBtn = document.getElementById('upload-btn');
+    const cameraBtn = document.getElementById('camera-btn');
+    const voiceBtn = document.getElementById('voice-btn');
+    const fileInput = document.getElementById('file-input');
+    const cameraModal = document.getElementById('camera-modal');
+    const previewModal = document.getElementById('preview-modal');
+    const cameraView = document.getElementById('camera-view');
+    const captureBtn = document.getElementById('capture-btn');
+    const previewImage = document.getElementById('preview-image');
+    const sendImageBtn = document.getElementById('send-image');
+    const voiceRecorder = document.getElementById('voice-recorder');
+    
+    // Variables
+    let mediaStream = null;
     let mediaRecorder = null;
     let audioChunks = [];
-    let currentChatId = 'welcome';
-    let chatWorker = null;
-    let recognition = null;
-    let isGenerating = false;
-
-    // Initialize Web Worker
-    function initWorker() {
-        if (window.Worker) {
-            try {
-                chatWorker = new Worker('../js/worker.js');
-                
-                chatWorker.onmessage = function(e) {
-                    const { action, result } = e.data;
-                    
-                    switch (action) {
-                        case 'process':
-                            handleAIResponse(result);
-                            break;
-                        case 'transcribe':
-                            messageInput.value = result;
-                            resizeTextarea();
-                            break;
-                        case 'error':
-                            showNotification('Worker error: ' + result, 'error');
-                            break;
-                    }
-                };
-                
-                chatWorker.onerror = function(error) {
-                    console.error('Worker error:', error);
-                    showNotification('Worker failed, using fallback', 'error');
-                    chatWorker = null;
-                };
-            } catch (e) {
-                console.warn('Web Worker not available:', e);
-                chatWorker = null;
-            }
-        }
-    }
-
-    // Initialize voice recognition
-    function initVoiceRecognition() {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = document.getElementById('voiceInputSelect').value;
-
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                if (chatWorker) {
-                    chatWorker.postMessage({
-                        action: 'transcribe',
-                        data: transcript
-                    });
-                } else {
-                    messageInput.value = transcript;
-                    resizeTextarea();
-                }
-            };
-
-            recognition.onerror = function(event) {
-                console.error('Speech recognition error:', event.error);
-                showNotification('Voice input failed: ' + event.error, 'error');
-                voiceBtn.classList.remove('recording');
-                isRecording = false;
-            };
-
-            recognition.onend = function() {
-                voiceBtn.classList.remove('recording');
-                isRecording = false;
-            };
-        }
-    }
-
+    let isRecording = false;
+    
     // Event Listeners
-    messageInput.addEventListener('input', resizeTextarea);
-    messageInput.addEventListener('keydown', handleKeydown);
     sendBtn.addEventListener('click', sendMessage);
-    stopBtn.addEventListener('click', stopGeneration);
-    voiceBtn.addEventListener('click', toggleVoiceRecording);
+    messageInput.addEventListener('keydown', handleInputKeydown);
     uploadBtn.addEventListener('click', triggerFileUpload);
-    cameraBtn.addEventListener('click', triggerCamera);
+    cameraBtn.addEventListener('click', openCamera);
+    voiceBtn.addEventListener('click', toggleVoiceRecording);
     fileInput.addEventListener('change', handleFileUpload);
-    cameraInput.addEventListener('change', handleCameraCapture);
-    newChatBtn.addEventListener('click', startNewChat);
-    clearHistoryBtn.addEventListener('click', clearChatHistory);
-    settingsBtn.addEventListener('click', openSettings);
-    exportChatBtn.addEventListener('click', exportChat);
-    closeModalBtn.addEventListener('click', closeSettings);
-
-    // Close modal when clicking outside
-    settingsModal.addEventListener('click', function(e) {
-        if (e.target === settingsModal) {
-            closeSettings();
-        }
+    captureBtn.addEventListener('click', capturePhoto);
+    sendImageBtn.addEventListener('click', sendCapturedImage);
+    
+    // Close modals when clicking on close button
+    document.querySelectorAll('.close-modal').forEach(button => {
+        button.addEventListener('click', () => {
+            cameraModal.classList.remove('active');
+            previewModal.classList.remove('active');
+            stopCamera();
+        });
     });
-
-    // Settings change handlers
-    document.getElementById('voiceInputSelect').addEventListener('change', function() {
-        if (recognition) {
-            recognition.lang = this.value;
-        }
+    
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                if (modal === cameraModal) {
+                    stopCamera();
+                }
+            }
+        });
     });
-
-    document.getElementById('themeSelect').addEventListener('change', function() {
-        applyTheme(this.value);
-    });
-
-    // Initialize
-    initWorker();
-    initVoiceRecognition();
-    loadChatHistory();
-    applyTheme(localStorage.getItem('theme') || 'dark');
-
+    
     // Functions
-    function resizeTextarea() {
-        messageInput.style.height = 'auto';
-        messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        if (message) {
+            // Add message to chat
+            addMessageToChat(message, 'user');
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Show generating indicator
+            sendBtn.classList.add('hidden');
+            generateBtn.classList.remove('hidden');
+            
+            // Simulate AI response (in a real app, this would be an API call)
+            setTimeout(() => {
+                // Hide generating indicator
+                generateBtn.classList.add('hidden');
+                sendBtn.classList.remove('hidden');
+                
+                // Add response
+                addMessageToChat("I'm thinking about your message: " + message, 'bot');
+                
+                // Scroll to bottom
+                scrollToBottom();
+            }, 2000);
+        }
     }
-
-    function handleKeydown(e) {
+    
+    function handleInputKeydown(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
     }
-
-    function sendMessage() {
-        const message = messageInput.value.trim();
-        const files = Array.from(uploadPreview.children);
-
-        if ((!message && files.length === 0) || isGenerating) return;
-
-        // Add user message to chat
-        addMessageToChat(message, 'user', files);
-
-        // Clear input and preview
-        messageInput.value = '';
-        uploadPreview.innerHTML = '';
-        resizeTextarea();
-
-        // Show stop button, hide send button
-        sendBtn.style.display = 'none';
-        stopBtn.style.display = 'flex';
-        isGenerating = true;
-
-        // Process with worker or direct API call
-        processMessage(message, files);
-    }
-
-    function processMessage(message, files) {
-        const payload = {
-            message: message,
-            files: files.map(file => file.dataset.type),
-            chatId: currentChatId,
-            model: document.getElementById('aiModelSelect').value
-        };
-
-        if (chatWorker) {
-            chatWorker.postMessage({
-                action: 'process',
-                data: payload
-            });
-        } else {
-            // Fallback to direct API call
-            simulateAIResponse(message);
-        }
-    }
-
-    function simulateAIResponse(message) {
-        // Show typing indicator
-        showTypingIndicator();
-
-        // Simulate AI processing delay
-        setTimeout(() => {
-            removeTypingIndicator();
-            
-            const responses = [
-                "I understand what you're asking about. Here's what I can tell you...",
-                "That's an interesting question. Based on my knowledge...",
-                "I can help you with that. Here's some information...",
-                "Thanks for your message. Let me provide some details about that..."
-            ];
-            
-            const response = responses[Math.floor(Math.random() * responses.length)];
-            handleAIResponse(response);
-        }, 2000);
-    }
-
-    function handleAIResponse(response) {
-        addMessageToChat(response, 'ai');
-        
-        // Hide stop button, show send button
-        stopBtn.style.display = 'none';
-        sendBtn.style.display = 'flex';
-        isGenerating = false;
-
-        // Save to chat history
-        saveChatHistory();
-    }
-
-    function stopGeneration() {
-        if (chatWorker) {
-            chatWorker.postMessage({ action: 'stop' });
-        }
-        
-        // Hide stop button, show send button
-        stopBtn.style.display = 'none';
-        sendBtn.style.display = 'flex';
-        isGenerating = false;
-
-        // Add cancellation message
-        addMessageToChat("Request cancelled by user.", 'ai');
-    }
-
-    function toggleVoiceRecording() {
-        if (!recognition) {
-            showNotification('Voice recognition not supported in your browser', 'error');
-            return;
-        }
-
-        if (isRecording) {
-            recognition.stop();
-            voiceBtn.classList.remove('recording');
-        } else {
-            try {
-                recognition.start();
-                voiceBtn.classList.add('recording');
-                isRecording = true;
-            } catch (error) {
-                console.error('Recognition start error:', error);
-                showNotification('Cannot start voice recording', 'error');
-            }
-        }
-    }
-
+    
     function triggerFileUpload() {
         fileInput.click();
     }
-
-    function triggerCamera() {
-        cameraInput.click();
-    }
-
+    
     function handleFileUpload(e) {
-        const files = e.target.files;
-        if (!files.length) return;
-
-        Array.from(files).forEach(file => {
-            if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                showNotification('File too large: ' + file.name, 'error');
-                return;
-            }
-
-            const previewItem = createPreviewItem(file);
-            uploadPreview.appendChild(previewItem);
-        });
-
-        // Reset file input
-        fileInput.value = '';
-    }
-
-    function handleCameraCapture(e) {
         const file = e.target.files[0];
-        if (!file) return;
-
-        const previewItem = createPreviewItem(file);
-        uploadPreview.appendChild(previewItem);
-
-        // Reset camera input
-        cameraInput.value = '';
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                previewImage.src = event.target.result;
+                previewModal.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
     }
-
-    function createPreviewItem(file) {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-        item.dataset.type = file.type;
-        item.dataset.name = file.name;
-
-        if (file.type.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            item.appendChild(img);
-        } else if (file.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(file);
-            video.muted = true;
-            item.appendChild(video);
-        } else {
-            const icon = document.createElement('div');
-            icon.className = 'file-icon';
-            icon.innerHTML = '<i class="fas fa-file"></i>';
-            item.appendChild(icon);
-        }
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove-preview';
-        removeBtn.innerHTML = '×';
-        removeBtn.onclick = () => item.remove();
-        item.appendChild(removeBtn);
-
-        return item;
+    
+    function openCamera() {
+        cameraModal.classList.add('active');
+        startCamera();
     }
-
-    function addMessageToChat(content, type, files = []) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}-message`;
-
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        
-        if (type === 'ai') {
-            avatar.innerHTML = '<img src="../assets/logo.png" alt="AI Avatar">';
-        } else {
-            avatar.innerHTML = '<i class="fas fa-user"></i>';
-        }
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-
-        if (content) {
-            const text = document.createElement('p');
-            text.textContent = content;
-            contentDiv.appendChild(text);
-        }
-
-        // Add file previews if any
-        if (files.length > 0) {
-            const filesContainer = document.createElement('div');
-            filesContainer.className = 'message-files';
-            files.forEach(file => {
-                const fileElement = file.cloneNode(true);
-                filesContainer.appendChild(fileElement);
+    
+    async function startCamera() {
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' }, 
+                audio: false 
             });
-            contentDiv.appendChild(filesContainer);
+            cameraView.srcObject = mediaStream;
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            alert('Unable to access camera. Please check permissions.');
         }
-
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'message-time';
-        timeSpan.textContent = new Date().toLocaleTimeString();
-
-        contentDiv.appendChild(timeSpan);
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(contentDiv);
-
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        // Save to chat history
-        saveChatHistory();
     }
-
-    function showTypingIndicator() {
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'message ai-message typing-indicator';
-        typingDiv.id = 'typingIndicator';
-
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.innerHTML = '<img src="../assets/logo.png" alt="AI Avatar">';
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        contentDiv.innerHTML = `
-            <div class="typing-indicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
+    
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+    }
+    
+    function capturePhoto() {
+        const canvas = document.getElementById('photo-canvas');
+        const context = canvas.getContext('2d');
+        
+        // Set canvas dimensions to match video
+        canvas.width = cameraView.videoWidth;
+        canvas.height = cameraView.videoHeight;
+        
+        // Draw current video frame to canvas
+        context.drawImage(cameraView, 0, 0, canvas.width, canvas.height);
+        
+        // Convert to data URL and show preview
+        previewImage.src = canvas.toDataURL('image/png');
+        
+        // Close camera and show preview
+        cameraModal.classList.remove('active');
+        previewModal.classList.add('active');
+        
+        // Stop camera
+        stopCamera();
+    }
+    
+    function sendCapturedImage() {
+        // In a real app, you would upload the image and send it as a message
+        addMessageToChat('', 'user', previewImage.src);
+        previewModal.classList.remove('active');
+    }
+    
+    function toggleVoiceRecording() {
+        if (isRecording) {
+            stopVoiceRecording();
+        } else {
+            startVoiceRecording();
+        }
+    }
+    
+    async function startVoiceRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+            
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                // In a real app, you would upload the audio and send it
+                addMessageToChat('', 'user', null, audioBlob);
+            };
+            
+            mediaRecorder.start();
+            isRecording = true;
+            voiceRecorder.classList.remove('hidden');
+            messageInput.classList.add('hidden');
+            
+            // Stop recording after 30 seconds max
+            setTimeout(() => {
+                if (isRecording) {
+                    stopVoiceRecording();
+                }
+            }, 30000);
+            
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+            alert('Unable to access microphone. Please check permissions.');
+        }
+    }
+    
+    function stopVoiceRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            isRecording = false;
+            voiceRecorder.classList.add('hidden');
+            messageInput.classList.remove('hidden');
+        }
+    }
+    
+    function addMessageToChat(text, sender, imageUrl = null, audioBlob = null) {
+        const messagesContainer = document.querySelector('.messages-container');
+        const messageEl = document.createElement('div');
+        messageEl.classList.add('message', `${sender}-message`);
+        
+        let contentHtml = '';
+        
+        if (imageUrl) {
+            contentHtml = `<img src="${imageUrl}" alt="Sent image" style="max-width: 100%; border-radius: 8px;">`;
+        } else if (audioBlob) {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            contentHtml = `
+                <audio controls style="width: 100%;">
+                    <source src="${audioUrl}" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            `;
+        } else {
+            contentHtml = `<p>${text}</p>`;
+        }
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageEl.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
+            </div>
+            <div class="message-content">
+                ${contentHtml}
+                <span class="message-time">${timeString}</span>
             </div>
         `;
-
-        typingDiv.appendChild(avatar);
-        typingDiv.appendChild(contentDiv);
-        chatMessages.appendChild(typingDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        messagesContainer.appendChild(messageEl);
+        scrollToBottom();
     }
-
-    function removeTypingIndicator() {
-        const typingIndicator = document.getElementById('typingIndicator');
-        if (typingIndicator) {
-            typingIndicator.remove();
-        }
+    
+    function scrollToBottom() {
+        const messagesContainer = document.querySelector('.messages-container');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-
-    function startNewChat() {
-        const newChatId = 'chat-' + Date.now();
-        currentChatId = newChatId;
-        
-        // Clear chat messages
-        chatMessages.innerHTML = '';
-        
-        // Add welcome message
-        addMessageToChat("Hello! I'm Burme Mark, your AI assistant. How can I help you today?", 'ai');
-        
-        // Add to chat history
-        addToChatHistory(newChatId, 'New Chat');
-        
-        // Update active chat
-        updateActiveChat(newChatId);
-    }
-
-    function addToChatHistory(chatId, title) {
-        const chatItem = document.createElement('div');
-        chatItem.className = 'chat-item';
-        chatItem.dataset.chatId = chatId;
-        
-        chatItem.innerHTML = `
-            <i class="fas fa-message"></i>
-            <span>${title}</span>
-            <button class="delete-chat-btn"><i class="fas fa-trash"></i></button>
-        `;
-        
-        chatItem.querySelector('.delete-chat-btn').onclick = (e) => {
-            e.stopPropagation();
-            deleteChat(chatId);
-        };
-        
-        chatItem.onclick = () => loadChat(chatId);
-        
-        chatHistory.insertBefore(chatItem, chatHistory.firstChild);
-    }
-
-    function loadChat(chatId) {
-        // Implementation for loading chat from storage
-        currentChatId = chatId;
-        updateActiveChat(chatId);
-        // Additional loading logic here
-    }
-
-    function deleteChat(chatId) {
-        if (chatId === currentChatId) {
-            startNewChat();
-        }
-        
-        const chatItem = document.querySelector(`.chat-item[data-chat-id="${chatId}"]`);
-        if (chatItem) {
-            chatItem.remove();
-        }
-        
-        // Remove from storage
-        localStorage.removeItem(`chat_${chatId}`);
-    }
-
-    function clearChatHistory() {
-        if (!confirm('Are you sure you want to clear all chat history?')) return;
-        
-        // Clear UI
-        chatHistory.innerHTML = '';
-        
-        // Clear storage (keep only current chat)
-        const keys = Object.keys(localStorage);
-        keys.forEach(key => {
-            if (key.startsWith('chat_') && key !== `chat_${currentChatId}`) {
-                localStorage.removeItem(key);
-            }
-        });
-        
-        // Add default welcome chat
-        addToChatHistory('welcome', 'Welcome to Burme Mark');
-        updateActiveChat('welcome');
-    }
-
-    function updateActiveChat(chatId) {
-        // Remove active class from all items
-        document.querySelectorAll('.chat-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // Add active class to current chat
-        const activeItem = document.querySelector(`.chat-item[data-chat-id="${chatId}"]`);
-        if (activeItem) {
-            activeItem.classList.add('active');
-        }
-    }
-
-    function saveChatHistory() {
-        const chatData = {
-            messages: Array.from(chatMessages.children).map(msg => ({
-                type: msg.classList.contains('user-message') ? 'user' : 'ai',
-                content: msg.querySelector('.message-content p')?.textContent || '',
-                time: msg.querySelector('.message-time').textContent
-            })),
-            timestamp: Date.now()
-        };
-        
-        localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(chatData));
-    }
-
-    function loadChatHistory() {
-        // Load chat list from storage
-        const keys = Object.keys(localStorage);
-        const chatKeys = keys.filter(key => key.startsWith('chat_'));
-        
-        if (chatKeys.length === 0) {
-            addToChatHistory('welcome', 'Welcome to Burme Mark');
-        } else {
-            chatKeys.forEach(key => {
-                const chatId = key.replace('chat_', '');
-                const chatData = JSON.parse(localStorage.getItem(key));
-                const title = chatData.messages[0]?.content.substring(0, 20) + '...' || 'Chat';
-                addToChatHistory(chatId, title);
-            });
-        }
-        
-        updateActiveChat(currentChatId);
-    }
-
-    function openSettings() {
-        settingsModal.classList.add('active');
-    }
-
-    function closeSettings() {
-        settingsModal.classList.remove('active');
-    }
-
-    function applyTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-    }
-
-    function exportChat() {
-        const chatData = {
-            messages: Array.from(chatMessages.children).map(msg => ({
-                type: msg.classList.contains('user-message') ? 'User' : 'AI',
-                content: msg.querySelector('.message-content p')?.textContent || '',
-                time: msg.querySelector('.message-time').textContent
-            })),
-            exportedAt: new Date().toISOString()
-        };
-        
-        const dataStr = JSON.stringify(chatData, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
-        const exportFileDefaultName = `burme-mark-chat-${currentChatId}.json`;
-        
-        const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', exportFileDefaultName);
-        linkElement.click();
-    }
-
-    // Cloudflare Worker integration
-    async function sendToCloudflareWorker(message, files) {
-        try {
-            const formData = new FormData();
-            formData.append('message', message);
-            formData.append('chatId', currentChatId);
-            formData.append('model', document.getElementById('aiModelSelect').value);
-
-            // Add files if any
-            if (files.length > 0) {
-                files.forEach((file, index) => {
-                    // Note: This would need actual File objects, not just preview elements
-                    // In a real impleme
+});
