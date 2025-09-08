@@ -1,4 +1,4 @@
-// Coder Page JavaScript
+// Coder Page JavaScript with Worker Integration
 document.addEventListener('DOMContentLoaded', function() {
     const codeInput = document.querySelector('.code-input textarea');
     const formatBtn = document.querySelector('.format-btn');
@@ -12,7 +12,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const templateButtons = document.querySelectorAll('.template-btn');
     
     let currentLanguage = 'python';
-    
+    let codeWorker = null;
+
+    // Initialize Web Worker
+    function initWorker() {
+        if (window.Worker) {
+            try {
+                codeWorker = new Worker('js/worker.js');
+                
+                codeWorker.onmessage = function(e) {
+                    const { action, result } = e.data;
+                    
+                    switch (action) {
+                        case 'format':
+                            handleFormatResult(result);
+                            break;
+                        case 'explain':
+                        case 'debug':
+                        case 'optimize':
+                            handleAnalysisResult(action, result);
+                            break;
+                        case 'generate':
+                            handleGenerationResult(result);
+                            break;
+                        case 'error':
+                            showNotification('Worker error: ' + result, 'error');
+                            break;
+                    }
+                };
+                
+                codeWorker.onerror = function(error) {
+                    console.error('Worker error:', error);
+                    showNotification('Worker failed, using fallback', 'error');
+                    // Fallback to non-worker implementation
+                    codeWorker = null;
+                };
+            } catch (e) {
+                console.warn('Web Worker not available:', e);
+                codeWorker = null;
+            }
+        }
+    }
+
     // Language selection
     if (languageSelect) {
         languageSelect.addEventListener('change', function() {
@@ -20,6 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
             updateCodeSyntaxHighlighting();
         });
     }
+    
+    // Initialize worker
+    initWorker();
     
     // Format button
     if (formatBtn) {
@@ -78,25 +122,20 @@ document.addEventListener('DOMContentLoaded', function() {
             formatBtn.disabled = true;
         }
         
-        // Simulate formatting
-        setTimeout(() => {
-            // Simple formatting simulation
-            const formattedCode = simulateCodeFormatting(code, currentLanguage);
-            
-            if (codeInput) {
-                codeInput.value = formattedCode;
-                codeInput.style.height = 'auto';
-                codeInput.style.height = (codeInput.scrollHeight) + 'px';
-            }
-            
-            // Reset button state
-            if (formatBtn) {
-                formatBtn.innerHTML = '<i class="fas fa-indent"></i> Format';
-                formatBtn.disabled = false;
-            }
-            
-            showNotification('Code formatted successfully!', 'success');
-        }, 1500);
+        if (codeWorker) {
+            // Use Web Worker
+            codeWorker.postMessage({
+                action: 'format',
+                data: code,
+                language: currentLanguage
+            });
+        } else {
+            // Fallback to direct processing
+            setTimeout(() => {
+                const formattedCode = simulateCodeFormatting(code, currentLanguage);
+                handleFormatResult(formattedCode);
+            }, 500);
+        }
     }
     
     function analyzeCode(action) {
@@ -122,28 +161,20 @@ document.addEventListener('DOMContentLoaded', function() {
             codeOutput.textContent = `// Analyzing code for ${action}...`;
         }
         
-        // Simulate analysis
-        setTimeout(() => {
-            const result = simulateCodeAnalysis(code, action, currentLanguage);
-            
-            if (codeOutput) {
-                codeOutput.textContent = result;
-                updateCodeSyntaxHighlighting();
-            }
-            
-            // Reset button state
-            if (button) {
-                const originalText = {
-                    'explain': 'Explain Code',
-                    'debug': 'Debug',
-                    'optimize': 'Optimize'
-                }[action];
-                button.innerHTML = `<i class="fas fa-${action === 'explain' ? 'question-circle' : action === 'debug' ? 'bug' : 'bolt'}"></i> ${originalText}`;
-                button.disabled = false;
-            }
-            
-            showNotification(`Code ${action} completed successfully!`, 'success');
-        }, 2000);
+        if (codeWorker) {
+            // Use Web Worker
+            codeWorker.postMessage({
+                action: action,
+                data: code,
+                language: currentLanguage
+            });
+        } else {
+            // Fallback to direct processing
+            setTimeout(() => {
+                const result = simulateCodeAnalysis(code, action, currentLanguage);
+                handleAnalysisResult(action, result);
+            }, 1000);
+        }
     }
     
     function generateCode() {
@@ -164,23 +195,108 @@ document.addEventListener('DOMContentLoaded', function() {
             codeOutput.textContent = `// Generating code for: ${description.substring(0, 50)}...`;
         }
         
-        // Simulate code generation
-        setTimeout(() => {
-            const generatedCode = simulateCodeGeneration(description, currentLanguage);
+        // Try Cloudflare Worker first, then fallback
+        generateWithCloudflareWorker(description)
+            .catch(error => {
+                console.warn('Cloudflare Worker failed, using fallback:', error);
+                if (codeWorker) {
+                    // Use Web Worker as fallback
+                    codeWorker.postMessage({
+                        action: 'generate',
+                        data: description,
+                        language: currentLanguage
+                    });
+                } else {
+                    // Final fallback to direct processing
+                    setTimeout(() => {
+                        const generatedCode = simulateCodeGeneration(description, currentLanguage);
+                        handleGenerationResult(generatedCode);
+                    }, 1500);
+                }
+            });
+    }
+    
+    async function generateWithCloudflareWorker(description) {
+        try {
+            const response = await fetch('https://your-worker.your-domain.workers.dev/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: description,
+                    language: currentLanguage,
+                    type: 'code'
+                })
+            });
             
-            if (codeOutput) {
-                codeOutput.textContent = generatedCode;
-                updateCodeSyntaxHighlighting();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            // Reset button state
-            if (generateBtn) {
-                generateBtn.innerHTML = '<i class="fas fa-code"></i> Generate Code';
-                generateBtn.disabled = false;
-            }
+            const data = await response.json();
+            handleGenerationResult(data.generatedCode || data.result);
             
-            showNotification('Code generated successfully!', 'success');
-        }, 2500);
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    function handleFormatResult(formattedCode) {
+        if (codeInput) {
+            codeInput.value = formattedCode;
+            codeInput.style.height = 'auto';
+            codeInput.style.height = (codeInput.scrollHeight) + 'px';
+        }
+        
+        // Reset button state
+        if (formatBtn) {
+            formatBtn.innerHTML = '<i class="fas fa-indent"></i> Format';
+            formatBtn.disabled = false;
+        }
+        
+        showNotification('Code formatted successfully!', 'success');
+    }
+    
+    function handleAnalysisResult(action, result) {
+        if (codeOutput) {
+            codeOutput.textContent = result;
+            updateCodeSyntaxHighlighting();
+        }
+        
+        // Reset button state
+        const button = {
+            'explain': explainBtn,
+            'debug': debugBtn,
+            'optimize': optimizeBtn
+        }[action];
+        
+        if (button) {
+            const originalText = {
+                'explain': 'Explain Code',
+                'debug': 'Debug',
+                'optimize': 'Optimize'
+            }[action];
+            button.innerHTML = `<i class="fas fa-${action === 'explain' ? 'question-circle' : action === 'debug' ? 'bug' : 'bolt'}"></i> ${originalText}`;
+            button.disabled = false;
+        }
+        
+        showNotification(`Code ${action} completed successfully!`, 'success');
+    }
+    
+    function handleGenerationResult(generatedCode) {
+        if (codeOutput) {
+            codeOutput.textContent = generatedCode;
+            updateCodeSyntaxHighlighting();
+        }
+        
+        // Reset button state
+        if (generateBtn) {
+            generateBtn.innerHTML = '<i class="fas fa-code"></i> Generate Code';
+            generateBtn.disabled = false;
+        }
+        
+        showNotification('Code generated successfully!', 'success');
     }
     
     function copyOutputCode() {
@@ -223,47 +339,48 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function simulateCodeFormatting(code, language) {
-        // Simple formatting simulation
         return code
-            .replace(/\n\s+\n/g, '\n\n') // Remove extra spaces between lines
-            .replace(/\t/g, '    ')      // Convert tabs to spaces
-            .replace(/{\s*/g, '{\n    ') // Add newline after opening braces
-            .replace(/}\s*/g, '\n}\n')   // Add newlines around closing braces
+            .replace(/\n\s+\n/g, '\n\n')
+            .replace(/\t/g, '    ')
+            .replace(/{\s*/g, '{\n    ')
+            .replace(/}\s*/g, '\n}\n')
             .trim();
     }
     
     function simulateCodeAnalysis(code, action, language) {
         const actions = {
-            'explain': `// Code Explanation:\n// This code appears to be written in ${language}.\n// It contains ${code.split('\n').length} lines of code.\n// The main functionality seems to be processing data or implementing an algorithm.\n// Key components include variable declarations, function definitions, and control structures.\n\n// For a detailed explanation, please provide more specific code.`,
-            'debug': `// Debug Analysis:\n// No syntax errors detected in the ${language} code.\n// Potential issues to check:\n// 1. Variable scope and initialization\n// 2. Function return values and error handling\n// 3. Input validation and edge cases\n// 4. Memory management (if applicable)\n\n// Recommendations:\n// - Add comprehensive error handling\n// - Include input validation\n// - Write unit tests for critical functions`,
-            'optimize': `// Optimization Suggestions for ${language}:\n\n// 1. Algorithm Complexity:\n//    - Current implementation appears to be O(n) or better\n//    - Consider using built-in functions for better performance\n\n// 2. Memory Usage:\n//    - Use generators or streams for large data processing\n//    - Avoid unnecessary variable declarations\n\n// 3. Best Practices:\n//    - Follow ${language} style guide\n//    - Add comments for complex logic\n//    - Consider using async/await for I/O operations\n\n// 4. Performance Tips:\n//    - Use appropriate data structures\n//    - Cache expensive operations\n//    - Minimize database queries (if applicable)`
+            'explain': `// Code Explanation:\n// This ${language} code contains ${code.split('\n').length} lines\n// Main functionality appears to be data processing/algorithm implementation`,
+            'debug': `// Debug Analysis:\n// No syntax errors found\n// Check variable scope, error handling, and edge cases`,
+            'optimize': `// Optimization Suggestions:\n// 1. Algorithm complexity analysis\n// 2. Memory usage optimization\n// 3. Best practices implementation`
         };
-        
         return actions[action] || '// Analysis completed';
     }
     
     function simulateCodeGeneration(description, language) {
         const templates = {
-            python: `# Generated code based on: ${description.substring(0, 50)}...\n\ndef main():\n    """\n    Main function implementation\n    """\n    # TODO: Implement the functionality described\n    print("Hello from generated code!")\n\nif __name__ == "__main__":\n    main()`,
-            javascript: `// Generated code based on: ${description.substring(0, 50)}...\n\nfunction main() {\n    /**\n     * Main function implementation\n     */\n    // TODO: Implement the functionality described\n    console.log("Hello from generated code!");\n}\n\n// Execute main function\nmain();`,
-            java: `// Generated code based on: ${description.substring(0, 50)}...\n\npublic class Main {\n    /**\n     * Main method implementation\n     */\n    public static void main(String[] args) {\n        // TODO: Implement the functionality described\n        System.out.println("Hello from generated code!");\n    }\n}`
+            python: `# Generated: ${description.substring(0, 50)}...\n\ndef main():\n    """Main function implementation"""\n    # TODO: Implement functionality\n    print("Hello from generated code!")\n\nif __name__ == "__main__":\n    main()`,
+            javascript: `// Generated: ${description.substring(0, 50)}...\n\nfunction main() {\n    // TODO: Implement functionality\n    console.log("Hello from generated code!");\n}\n\nmain();`,
+            java: `// Generated: ${description.substring(0, 50)}...\n\npublic class Main {\n    public static void main(String[] args) {\n        // TODO: Implement functionality\n        System.out.println("Hello from generated code!");\n    }\n}`
         };
-        
         return templates[language] || templates.python;
     }
     
     function updateCodeSyntaxHighlighting() {
-        // Simple syntax highlighting simulation
-        // In a real app, you would use a library like Prism.js or Highlight.js
         if (codeOutput) {
             const code = codeOutput.textContent;
-            // This is a very basic simulation - real highlighting would be more complex
             codeOutput.innerHTML = code
                 .replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
                 .replace(/".*?"/g, '<span class="string">$&</span>')
                 .replace(/\b(function|def|class|if|else|for|while|return)\b/g, '<span class="keyword">$1</span>');
         }
     }
+    
+    // Cleanup worker when page unloads
+    window.addEventListener('beforeunload', function() {
+        if (codeWorker) {
+            codeWorker.terminate();
+        }
+    });
     
     // Initialize code syntax highlighting
     updateCodeSyntaxHighlighting();
