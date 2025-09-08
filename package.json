@@ -1,0 +1,16 @@
+{
+  "name": "burme-mark-chatbot",
+  "version": "1.0.0",
+  "description": "A Myanmar language chat bot built on Cloudflare Workers",
+  "main": "../worker/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^3.11.7"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
