@@ -24,11 +24,11 @@ body {
     background-color: #f5f7fb;
     color: var(--dark);
     line-height: 1.6;
-    background-image: url('assets/background.svg');
+    background-image: url('../assets/background.svg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    height: 100vh;
+    height: 90vh;
     overflow: hidden;
 }
 
