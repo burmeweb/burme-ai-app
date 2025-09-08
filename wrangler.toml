@@ -6,7 +6,7 @@ main = "src/index.js"
 
 # Routes configuration
 [[routes]]
-pattern = "api.burmemark-worker.mysvm.workers.dev/*"
+pattern = "burmemark-worker.mysvm.workers.dev/*"
 custom_domain = true
 
 [vars]
