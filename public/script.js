@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let audioChunks = [];
     let uploadedFilesList = [];
     
+    // API Base URL - Cloudflare Worker URL
+    const API_BASE = 'https://burmemark-worker.mysvm.workers.dev';
+    
     // Event Listeners
     sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', function(e) {
@@ -92,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Functions
-    function sendMessage() {
+    async function sendMessage() {
         const message = messageInput.value.trim();
         if (!message) return;
         
@@ -102,19 +105,36 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading animation
         showLoading();
         
-        // Simulate API call delay
-        setTimeout(() => {
+        try {
+            // Send message to Cloudflare Worker API
+            const response = await fetch(`${API_BASE}/api/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage('တောင်းပန်ပါတယ်၊ အချိန်အနည်းငယ်စောင့်ပြီးထပ်ကြိုးစားပေးပါ။', 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('ဆက်သွယ်ရေးအမှား ကျေးဇူးပြု၍ နောက်မှထပ်ကြိုးစားပေးပါ။', 'bot');
+        } finally {
             hideLoading();
-            generateBotResponse(message);
-        }, 1500);
+        }
     }
     
     function sendSpecialMessage(type) {
         let message = '';
         if (type === 'image') {
-            message = 'ပုံတစ်ပုံ ထုတ်ပေးပါ';
+            message = 'image ကြောင်ပုံ';
         } else if (type === 'code') {
-            message = 'Python ကုဒ် ရေးပေးပါ';
+            message = 'code Python Fibonacci function';
         }
         
         messageInput.value = message;
@@ -134,7 +154,25 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const messageText = document.createElement('div');
         messageText.classList.add('message-text');
-        messageText.textContent = text;
+        
+        // Check if the message contains code blocks and format them
+        if (text.includes('```')) {
+            const parts = text.split('```');
+            parts.forEach((part, index) => {
+                if (index % 2 === 1) {
+                    // This is a code block
+                    const codeBlock = document.createElement('pre');
+                    codeBlock.textContent = part;
+                    messageText.appendChild(codeBlock);
+                } else {
+                    // This is regular text
+                    const textNode = document.createTextNode(part);
+                    messageText.appendChild(textNode);
+                }
+            });
+        } else {
+            messageText.textContent = text;
+        }
         
         const messageTime = document.createElement('div');
         messageTime.classList.add('message-time');
@@ -148,27 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-    
-    function generateBotResponse(userMessage) {
-        let response = '';
-        const lowerMsg = userMessage.toLowerCase();
-        
-        if (lowerMsg.includes('hello') || lowerMsg.includes('hi') || lowerMsg.includes('နေကောင်းလား')) {
-            response = 'မင်္ဂလာပါ! Burme Mark Chat Bot မှ ကြိုဆိုပါတယ်။ ဘာလုပ်ပေးရမလဲ?';
-        } else if (lowerMsg.includes('name') || lowerMsg.includes('နာမည်')) {
-            response = 'ကျွန်တော့်နာမည်က Burme Mark Chat Bot ပါ။ ကျေးဇူးပြု၍ မိတ်ဆက်ရတာ ဝမ်းသာပါတယ်။';
-        } else if (lowerMsg.includes('help') || lowerMsg.includes('ကူညီ')) {
-            response = 'ကျွန်တော်က မြန်မာလို စကားပြောပေးတဲ့ chat bot ပါ။\n\nကျွန်တော်နဲ့:\n- စကားပြောနိုင်ပါတယ်\n- ပုံတွေထုတ်ပေးနိုင်ပါတယ်\n- ကုဒ်တွေ ရေးပေးနိုင်ပါတယ်\n- ဘာသာပြန်ပေးနိုင်ပါတယ်';
-        } else if (lowerMsg.includes('image') || lowerMsg.includes('ပုံ')) {
-            response = 'ပုံထုတ်ပေးဖို့ ပြင်ဆင်နေပါတယ်။ ဘယ်လိုပုံမျိုး ထုတ်ချင်ပါသလဲ?';
-        } else if (lowerMsg.includes('code') || lowerMsg.includes('ကုဒ်')) {
-            response = 'ကုဒ်ရေးပေးဖို့ ပြင်ဆင်နေပါတယ်။ ဘယ်ဘာသာစကားနဲ့ ရေးပေးရမလဲ?';
-        } else {
-            response = 'နားမလည်လို့ ကျေးဇူးပြု၍ ထပ်မေးပေးပါ။ ကျွန်တော်က စကားပြောတာ၊ ပုံထုတ်ပေးတာ၊ ကုဒ်ရေးပေးတာ စတာတွေ လုပ်ပေးနိုင်ပါတယ်။';
-        }
-        
-        addMessage(response, 'bot');
     }
     
     function getCurrentTime() {
@@ -265,13 +282,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                // Here you would typically send the audio blob to your server for processing
-                // For this example, we'll just simulate a response
                 
-                addMessage('စကားပြောမှတ်တမ်း', 'user');
-                setTimeout(() => {
-                    addMessage('စကားပြောမှုကို နားလည်ပါတယ်။ ကျေးဇူးတင်ပါတယ်။', 'bot');
-                }, 1000);
+                // Send audio to server for processing
+                sendAudioToServer(audioBlob);
             };
             
             mediaRecorder.start();
@@ -282,6 +295,46 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error accessing microphone:', error);
             alert('မိုက်ကရိုဖုန်းကို အသုံးပြုခွင့် ရှိရန် လိုအပ်ပါတယ်');
+        }
+    }
+    
+    async function sendAudioToServer(audioBlob) {
+        showLoading();
+        
+        try {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.wav');
+            
+            const response = await fetch(`${API_BASE}/api/voice`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                addMessage(data.text, 'user');
+                
+                // Get bot response
+                const botResponse = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: data.text })
+                });
+                
+                if (botResponse.ok) {
+                    const botData = await botResponse.json();
+                    addMessage(botData.response, 'bot');
+                }
+            } else {
+                addMessage('အသံဖမ်းယူမှု မအောင်မြင်ပါ', 'bot');
+            }
+        } catch (error) {
+            console.error('Error sending audio:', error);
+            addMessage('အသံပို့ဆောင်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်', 'bot');
+        } finally {
+            hideLoading();
         }
     }
     
