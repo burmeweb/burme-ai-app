@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { handleChatRequest } from '../worker/handlers.js'
+import { handleChatRequest } from './handlers.js'
 
 const app = new Hono()
 
