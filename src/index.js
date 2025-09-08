@@ -11,9 +11,9 @@ app.use('*', async (c, next) => {
   await next()
 })
 
-// Routes
-app.get('/', (c) => c.text('Burme Mark Chat Bot API'))
-app.post('/api/chat', handleChatRequest)
+// API Routes
+app.get('/', (c) => c.json({ message: 'Burme Mark API' }))
 app.get('/api/health', (c) => c.json({ status: 'ok' }))
+app.post('/api/chat', handleChatRequest)
 
 export default app
