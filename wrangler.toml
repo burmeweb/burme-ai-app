@@ -2,7 +2,7 @@
 name = 'burmemark-worker'
 compatibility_date = "2024-05-01"
 compatibility_flags = ["nodejs_compat"]
-main = "src/index.js"  # ဒီလိုင်းကို ထည့်ပါ
+main = "../index.js"  # ဒီလိုင်းကို ထည့်ပါ
 
 # Routes configuration
 [[routes]]
