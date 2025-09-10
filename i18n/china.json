@@ -1,0 +1,25 @@
+{
+    "title": "语言设置",
+    "appLanguage": "应用语言",
+    "chooseLanguage": "选择您偏好的应用界面语言。",
+    "translationSettings": "翻译设置",
+    "autoTranslate": "自动翻译",
+    "autoTranslateDesc": "自动将消息翻译成您选择的语言",
+    "detectLanguage": "检测语言",
+    "detectLanguageDesc": "自动检测传入消息的语言",
+    "languages": {
+        "en": "英语",
+        "my": "缅甸语",
+        "zh": "中文",
+        "th": "泰语",
+        "ph": "菲律宾语",
+        "ru": "俄语",
+        "arb": "阿拉伯语"
+    },
+    "save": "保存",
+    "cancel": "取消",
+    "apply": "应用",
+    "reset": "重置为默认",
+    "confirmation": "语言已更改为中文",
+    "error": "加载语言文件时出错"
+}

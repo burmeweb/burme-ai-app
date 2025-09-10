@@ -1,0 +1,25 @@
+{
+    "title": "Mga Setting ng Wika",
+    "appLanguage": "Wika ng App",
+    "chooseLanguage": "Piliin ang iyong ginustong wika para sa interface ng app.",
+    "translationSettings": "Mga Setting ng Pagsasalin",
+    "autoTranslate": "Awtomatikong Isalin",
+    "autoTranslateDesc": "Awtomatikong isalin ang mga mensahe sa iyong napiling wika",
+    "detectLanguage": "Tuklasin ang Wika",
+    "detectLanguageDesc": "Awtomatikong tuklasin ang wika ng papasok na mga mensahe",
+    "languages": {
+        "en": "Ingles",
+        "my": "Burmese",
+        "zh": "Intsik",
+        "th": "Thai",
+        "ph": "Pilipino",
+        "ru": "Ruso",
+        "arb": "Arabe"
+    },
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "apply": "Ilapat",
+    "reset": "I-reset sa Default",
+    "confirmation": "Ang wika ay binago sa Filipino",
+    "error": "Error sa pag-load ng file ng wika"
+}

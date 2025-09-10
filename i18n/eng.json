@@ -1,0 +1,25 @@
+{
+    "title": "Language Settings",
+    "appLanguage": "App Language",
+    "chooseLanguage": "Choose your preferred language for the app interface.",
+    "translationSettings": "Translation Settings",
+    "autoTranslate": "Auto-Translate",
+    "autoTranslateDesc": "Automatically translate messages to your selected language",
+    "detectLanguage": "Detect Language",
+    "detectLanguageDesc": "Automatically detect the language of incoming messages",
+    "languages": {
+        "en": "English",
+        "my": "Burmese",
+        "zh": "Chinese",
+        "th": "Thai",
+        "ph": "Filipino",
+        "ru": "Russian",
+        "arb": "Arabic"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "reset": "Reset to Default",
+    "confirmation": "Language changed to English",
+    "error": "Error loading language file"
+}
