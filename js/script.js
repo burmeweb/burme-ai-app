@@ -11,8 +11,10 @@ const uploadBtn = document.getElementById('uploadBtn');
 const voiceBtn = document.getElementById('voiceBtn');
 
 // Worker endpoint URLs
-const CHAT_API_ENDPOINT = "https://burmemark-worker.mysvm.workers.dev/api/chat";
-const IMAGE_API_ENDPOINT = "https://burmemark-worker.mysvm.workers.dev/api/image";
+const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev";
+const CHAT_API_ENDPOINT = `${WORKER_BASE_URL}/api/chat`;
+const IMAGE_API_ENDPOINT = `${WORKER_BASE_URL}/api/image`;
+const CODE_API_ENDPOINT = `${WORKER_BASE_URL}/api/code`;
 
 // Toggle sidebar on mobile
 menuBtn.addEventListener('click', () => {
@@ -41,7 +43,7 @@ newChatBtn.addEventListener('click', () => {
     messageInput.focus();
     
     // Show welcome message
-    addMessage('assistant', 'Hello! How can I assist you today?');
+    addMessage('assistant', 'Hello! How can I assist you today? You can ask me anything, type "/image prompt" to generate images, or "/code prompt" to generate code.');
 });
 
 // Clear conversations
@@ -74,6 +76,23 @@ async function sendMessage() {
         
         // Clear input
         messageInput.value = '';
+        
+        // Check for special commands
+        if (message.startsWith('/image ')) {
+            const prompt = message.substring(7);
+            if (prompt) {
+                await generateImage(prompt);
+            }
+            return;
+        }
+        
+        if (message.startsWith('/code ')) {
+            const prompt = message.substring(6);
+            if (prompt) {
+                await generateCode(prompt);
+            }
+            return;
+        }
         
         // Show typing indicator
         const typingIndicator = document.createElement('div');
@@ -131,6 +150,9 @@ function addMessage(sender, text) {
     let contentHtml = text;
     if (text.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
         contentHtml = `<img src="${text}" alt="Generated image" style="max-width: 100%; border-radius: 8px; margin-top: 8px;">`;
+    } else if (text.includes('```')) {
+        // Format code blocks with syntax highlighting
+        contentHtml = formatCodeBlocks(text);
     }
     
     messageElement.innerHTML = `
@@ -145,6 +167,48 @@ function addMessage(sender, text) {
     
     chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Format code blocks with syntax highlighting
+function formatCodeBlocks(text) {
+    return text.replace(/```(\w+)?\s([\s\S]*?)```/g, (match, language, code) => {
+        const langClass = language ? `language-${language}` : '';
+        return `
+            <div class="code-block">
+                <div class="code-header">
+                    <span>${language || 'code'}</span>
+                    <button class="copy-code-btn" onclick="copyCodeToClipboard(this)">Copy</button>
+                </div>
+                <pre><code class="${langClass}">${escapeHtml(code.trim())}</code></pre>
+            </div>
+        `;
+    });
+}
+
+// Escape HTML special characters
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Copy code to clipboard
+function copyCodeToClipboard(button) {
+    const codeBlock = button.parentElement.nextElementSibling;
+    const codeText = codeBlock.textContent;
+    
+    navigator.clipboard.writeText(codeText).then(() => {
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
 }
 
 // Generate image from text
@@ -196,6 +260,55 @@ async function generateImage(prompt) {
     }
 }
 
+// Generate code from text
+async function generateCode(prompt) {
+    if (!prompt) return;
+    
+    // Show typing indicator for code generation
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'message assistant typing';
+    typingIndicator.innerHTML = `
+        <div class="message-content">
+            <div class="typing-indicator">
+                <span>Generating code...</span>
+            </div>
+        </div>
+    `;
+    chatBox.appendChild(typingIndicator);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    
+    try {
+        // Call the code generation API
+        const response = await fetch(CODE_API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+        
+        const data = await response.json();
+        
+        // Remove typing indicator
+        chatBox.removeChild(typingIndicator);
+        
+        // Add code response
+        if (data.code || data.response) {
+            addMessage('assistant', data.code || data.response);
+        } else {
+            addMessage('assistant', data.message || "I couldn't generate code for that prompt.");
+        }
+    } catch (error) {
+        console.error('Error generating code:', error);
+        
+        // Remove typing indicator
+        chatBox.removeChild(typingIndicator);
+        
+        // Add error message
+        addMessage('assistant', "I'm having trouble connecting to the code generation service.");
+    }
+}
+
 // Event listeners
 sendBtn.addEventListener('click', sendMessage);
 
@@ -209,13 +322,23 @@ messageInput.addEventListener('keypress', (e) => {
 uploadBtn.addEventListener('click', () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = 'image/*, .txt, .pdf';
+    fileInput.accept = 'image/*, .txt, .pdf, .js, .py, .java, .html, .css';
     
     fileInput.onchange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            alert(`File "${file.name}" selected. Upload functionality would be implemented here.`);
-            // Here you would typically upload the file and process it
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const content = event.target.result;
+                if (file.type.startsWith('image/')) {
+                    // For images, you might want to display or process them
+                    alert(`Image "${file.name}" selected. Image processing would be implemented here.`);
+                } else {
+                    // For text files, you can send the content as a message
+                    messageInput.value = `/code Please analyze this ${file.name} file:\n\n${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}`;
+                }
+            };
+            reader.readAsText(file);
         }
     };
     
@@ -273,8 +396,15 @@ voiceBtn.addEventListener('click', () => {
 // Initialize with welcome message
 window.addEventListener('load', () => {
     setTimeout(() => {
-        addMessage('assistant', 'Hello! How can I assist you today? You can ask me anything or type "/image" followed by a description to generate an image.');
+        addMessage('assistant', 'Hello! How can I assist you today? You can:\n- Ask me anything\n- Type "/image prompt" to generate images\n- Type "/code prompt" to generate code\n- Upload files for analysis');
     }, 500);
+    
+    // Load highlight.js for code syntax highlighting
+    if (typeof hljs !== 'undefined') {
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+    }
 });
 
 // Close sidebar when clicking outside on mobile
@@ -292,29 +422,58 @@ sidebar.addEventListener('click', (e) => {
     e.stopPropagation();
 });
 
-// Handle special commands
-messageInput.addEventListener('input', (e) => {
-    const text = e.target.value;
-    if (text.startsWith('/image ')) {
-        // You could show a hint that this will generate an image
-    }
+// Auto-scroll to bottom when new messages are added
+const observer = new MutationObserver(() => {
+    chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-// Override sendMessage to handle special commands
-const originalSendMessage = sendMessage;
-sendMessage = async function() {
-    const message = messageInput.value.trim();
-    
-    if (message.startsWith('/image ')) {
-        const prompt = message.substring(7); // Remove "/image " prefix
-        if (prompt) {
-            addMessage('user', message);
-            messageInput.value = '';
-            await generateImage(prompt);
-        }
-        return;
+observer.observe(chatBox, { childList: true });
+
+// Add CSS for code blocks
+const style = document.createElement('style');
+style.textContent = `
+    .code-block {
+        background: var(--code-bg);
+        border-radius: 8px;
+        margin: 8px 0;
+        overflow: hidden;
     }
     
-    // Handle other commands or normal messages
-    originalSendMessage();
-};
+    .code-header {
+        background: var(--sidebar-bg);
+        padding: 8px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+    
+    .copy-code-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+    }
+    
+    .copy-code-btn:hover {
+        background: var(--primary-dark);
+    }
+    
+    pre {
+        margin: 0;
+        padding: 12px;
+        overflow-x: auto;
+    }
+    
+    code {
+        font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+`;
+
+document.head.appendChild(style);
