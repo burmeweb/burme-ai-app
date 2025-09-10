@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Settings - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .language-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .language-section {
+            padding: 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .language-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .language-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .language-item:hover {
+            background-color: #f7fafc;
+        }
+
+        .language-item.selected {
+            background-color: #ebf4ff;
+            border: 1px solid #c3dafe;
+        }
+
+        .language-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .language-flag {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .flag-en {
+            background-color: #012169;
+        }
+
+        .flag-my {
+            background: linear-gradient(to bottom, #fecb00 33%, #34b233 33%, #34b233 66%, #ea2839 66%);
+        }
+
+        .flag-zh {
+            background-color: #de2910;
+        }
+
+        .flag-th {
+            background: linear-gradient(to bottom, #a51931 20%, white 20%, white 80%, #a51931 80%);
+            position: relative;
+        }
+
+        .flag-th::before {
+            content: "";
+            position: absolute;
+            top: 30%;
+            bottom: 30%;
+            left: 0;
+            right: 0;
+            background-color: #2d2a4a;
+        }
+
+        .flag-ph {
+            background: linear-gradient(to bottom, #0038a8 40%, #ce1126 40%, #ce1126 60%, white 60%);
+            position: relative;
+        }
+
+        .flag-ru {
+            background: linear-gradient(to bottom, white 33%, #0039a6 33%, #0039a6 66%, #d52b1e 66%);
+        }
+
+        .flag-arb {
+            background-color: #006c35;
+        }
+
+        .language-name {
+            font-weight: 500;
+        }
+
+        .language-native {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .selected-indicator {
+            color: #4a6cf7;
+            font-size: 1.2rem;
+        }
+
+        .auto-translate {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .toggle-label {
+            flex: 1;
+        }
+
+        .toggle-label h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .toggle-label p {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4a6cf7;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+            padding: 0 20px 20px;
+        }
+
+        .action-button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .button-primary {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+        }
+
+        .button-primary:hover {
+            background-color: #3b5bdb;
+        }
+
+        .button-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+        }
+
+        .button-secondary:hover {
+            background-color: #cbd5e0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .language-section {
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 data-i18n="title">Language Settings</h1>
+        </header>
+
+        <div class="language-card">
+            <div class="language-section">
+                <h2 class="section-title" data-i18n="appLanguage"><i class="fas fa-globe"></i> App Language</h2>
+                <p style="margin-bottom: 15px; color: #718096;" data-i18n="chooseLanguage">Choose your preferred language for the app interface.</p>
+                
+                <div class="language-item selected" data-lang="en" onclick="selectLanguage('en')">
+                    <div class="language-info">
+                        <div class="language-flag flag-en">EN</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.en">English</div>
+                            <div class="language-native">English</div>
+                        </div>
+                    </div>
+                    <div class="selected-indicator">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                
+                <div class="language-item" data-lang="my" onclick="selectLanguage('my')">
+                    <div class="language-info">
+                        <div class="language-flag flag-my">MY</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.my">Burmese</div>
+                            <div class="language-native">မြန်မာ</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="language-item" data-lang="zh" onclick="selectLanguage('zh')">
+                    <div class="language-info">
+                        <div class="language-flag flag-zh">CN</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.zh">Chinese</div>
+                            <div class="language-native">中文</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="language-item" data-lang="th" onclick="selectLanguage('th')">
+                    <div class="language-info">
+                        <div class="language-flag flag-th">TH</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.th">Thai</div>
+                            <div class="language-native">ไทย</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="language-item" data-lang="ph" onclick="selectLanguage('ph')">
+                    <div class="language-info">
+                        <div class="language-flag flag-ph">PH</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.ph">Filipino</div>
+                            <div class="language-native">Pilipino</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="language-item" data-lang="ru" onclick="selectLanguage('ru')">
+                    <div class="language-info">
+                        <div class="language-flag flag-ru">RU</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.ru">Russian</div>
+                            <div class="language-native">Русский</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="language-item" data-lang="arb" onclick="selectLanguage('arb')">
+                    <div class="language-info">
+                        <div class="language-flag flag-arb">AR</div>
+                        <div>
+                            <div class="language-name" data-i18n-key="languages.arb">Arabic</div>
+                            <div class="language-native">العربية</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="language-section">
+                <h2 class="section-title" data-i18n="translationSettings"><i class="fas fa-language"></i> Translation Settings</h2>
+                
+                <div class="auto-translate">
+                    <div class="toggle-label">
+                        <h3 data-i18n="autoTranslate">Auto-Translate</h3>
+                        <p data-i18n="autoTranslateDesc">Automatically translate messages to your selected language</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoTranslate" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="auto-translate">
+                    <div class="toggle-label">
+                        <h3 data-i18n="detectLanguage">Detect Language</h3>
+                        <p data-i18n="detectLanguageDesc">Automatically detect the language of incoming messages</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="detectLanguage" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-button button-secondary" data-i18n="cancel" onclick="goBack()">Cancel</button>
+                <button class="action-button button-secondary" data-i18n="reset" onclick="resetToDefault()">Reset to Default</button>
+                <button class="action-button button-primary" data-i18n="apply" onclick="applyLanguage()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global translations object
+        let translations = {};
+        let currentLanguage = 'en';
+        
+        // Language file paths
+        const languageFiles = {
+            'en': '../i18n/eng.json',
+            'my': '../i18n/my.json',
+            'zh': '../i18n/china.json',
+            'th': '../i18n/thai.json',
+            'ph': '../i18n/phi.json',
+            'ru': '../i18n/ru.json',
+            'arb': '../i18n/arb.json'
+        };
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectLanguage(langCode) {
+            // Remove selected class from all items
+            document.querySelectorAll('.language-item').forEach(item => {
+                item.classList.remove('selected');
+                item.querySelector('.selected-indicator')?.remove();
+            });
+            
+            // Add selected class to clicked item
+            const selectedItem = event.currentTarget;
+            selectedItem.classList.add('selected');
+            
+            // Add checkmark indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'selected-indicator';
+            indicator.innerHTML = '<i class="fas fa-check-circle"></i>';
+            selectedItem.appendChild(indicator);
+            
+            // Load the language file
+            loadLanguageFile(langCode);
+        }
+        
+        function loadLanguageFile(langCode) {
+            const filePath = languageFiles[langCode];
+            
+            if (filePath) {
+                fetch(filePath)
+                    .then(response => response.json())
+                    .then(data => {
+                        translations[langCode] = data;
+                        applyTranslations(data);
+                        currentLanguage = langCode;
+                    })
+                    .catch(error => {
+                        console.error('Error loading language file:', error);
+                        showMessage('Error loading language file. Using default language.');
+                    });
+            }
+        }
+        
+        function applyTranslations(translationData) {
+            // Apply translations to all elements with data-i18n attributes
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translationData[key]) {
+                    element.textContent = translationData[key];
+                }
+            });
+            
+            // Apply translations to elements with data-i18n-key attributes
+            document.querySelectorAll('[data-i18n-key]').forEach(element => {
+                const key = element.getAttribute('data-i18n-key');
+                const value = getNestedTranslation(translationData, key);
+                if (value) {
+                    element.textContent = value;
+                }
+            });
+        }
+        
+        function getNestedTranslation(translationData, key) {
+            return key.split('.').reduce((obj, i) => (obj ? obj[i] : null), translationData);
+        }
+        
+        function applyLanguage() {
+            const selectedLang = document.querySelector('.language-item.selected').getAttribute('data-lang');
+            const langName = document.querySelector('.language-item.selected .language-name').textContent;
+            
+            // Save preferences
+            const preferences = {
+                language: selectedLang,
+                autoTranslate: document.getElementById('autoTranslate').checked,
+                detectLanguage: document.getElementById('detectLanguage').checked
+            };
+            
+            localStorage.setItem('languagePreferences', JSON.stringify(preferences));
+            localStorage.setItem('selectedLanguage', selectedLang);
+            
+            // Update all pages with the new language
+            updateAllPagesLanguage(selectedLang);
+            
+            // Show confirmation
+            showMessage(translations[selectedLang]?.confirmation || `Language changed to ${langName}`);
+            
+            // Close after a short delay
+            setTimeout(() => {
+                window.history.back();
+            }, 1500);
+        }
+        
+        function resetToDefault() {
+            localStorage.removeItem('languagePreferences');
+            localStorage.removeItem('selectedLanguage');
+            
+            // Reset toggles
+            document.getElementById('autoTranslate').checked = true;
+            document.getElementById('detectLanguage').checked = true;
+            
+            // Reset to English
+            selectLanguage('en');
+            showMessage('Reset to default language (English)');
+        }
+        
+        function showMessage(message) {
+            // Create a temporary notification
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = '#4a6cf7';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '6px';
+            notification.style.zIndex = '1000';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        function updateAllPagesLanguage(langCode) {
+            // This function would be implemented to update all open pages
+            // In a real application, you might use a state management system
+            // or broadcast the language change to all tabs/windows
+            
+            // For now, we'll just store the preference
+            console.log(`Language updated to ${langCode} for all pages`);
+        }
+        
+        // Load saved language preference on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved preferences
+            const savedPreferences = JSON.parse(localStorage.getItem('languagePreferences') || '{}');
+            const savedLanguage = savedPreferences.language || localStorage.getItem('selectedLanguage') || 'en';
+            
+            // Set toggles
+            if (savedPreferences.autoTranslate !== undefined) {
+                document.getElementById('autoTranslate').checked = savedPreferences.autoTranslate;
+            }
+            
+            if (savedPreferences.detectLanguage !== undefined) {
+                document.getElementById('detectLanguage').checked = savedPreferences.detectLanguage;
+            }
+            
+            // Load the language
+            loadLanguageFile(savedLanguage);
+            
+            // Select the language item
+            setTimeout(() => {
+                const languageItem = document.querySelector(`.language-item[data-lang="${savedLanguage}"]`);
+                if (languageItem) {
+                    languageItem.click();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

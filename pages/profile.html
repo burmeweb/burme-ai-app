@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .profile-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #4a6cf7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #718096;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .save-button {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .save-button:hover {
+            background-color: #3b5bdb;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Profile Settings</h1>
+        </header>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h2>John Doe</h2>
+                    <p>john.doe@example.com</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" value="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" value="john.doe@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" value="+1 (555) 123-4567">
+            </div>
+
+            <div class="form-group">
+                <label for="language">Preferred Language</label>
+                <select id="language">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                </select>
+            </div>
+
+            <button class="save-button">Save Changes</button>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

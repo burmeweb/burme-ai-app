@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="settingsTitle">Settings - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/i18n.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .settings-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .settings-section {
+            padding: 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .text-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            text-decoration: none;
+            color: #4a5568;
+            transition: color 0.3s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .text-button:hover {
+            color: #4a6cf7;
+        }
+
+        .text-button i {
+            margin-left: 10px;
+            color: #a0aec0;
+        }
+
+        .text-button:hover i {
+            color: #4a6cf7;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-group .text-button {
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .button-group .text-button:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4a6cf7;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .app-version {
+            margin-top: 5px;
+            font-size: 0.8rem;
+        }
+
+        .language-indicator {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #ebf4ff;
+            color: #4a6cf7;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .settings-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 data-i18n="settingsTitle">Settings</h1>
+        </header>
+
+        <div class="settings-card">
+            <div class="settings-section">
+                <h2 class="section-title" data-i18n="accountSettings"><i class="fas fa-user-cog"></i> Account Settings</h2>
+                <div class="button-group">
+                    <button class="text-button" onclick="openPage('profile.html')">
+                        <span data-i18n="profileInfo">Profile Information</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="text-button" onclick="openPage('language.html')">
+                        <span data-i18n="languagePreferences">Language Preferences</span> 
+                        <span>
+                            <span id="currentLanguage" class="language-indicator">EN</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </button>
+                    <button class="text-button" onclick="openPage('notification.html')">
+                        <span data-i18n="notificationSettings">Notification Settings</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2 class="section-title" data-i18n="privacySecurity"><i class="fas fa-shield-alt"></i> Privacy & Security</h2>
+                <div class="button-group">
+                    <button class="text-button" onclick="openPage('policy.html')">
+                        <span data-i18n="privacyPolicy">Privacy Policy</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="text-button" onclick="openPage('data.html')">
+                        <span data-i18n="dataManagement">Data Management</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="text-button" onclick="openPage('security.html')">
+                        <span data-i18n="securitySettings">Security Settings</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2 class="section-title" data-i18n="appSettings"><i class="fas fa-sliders-h"></i> Application Settings</h2>
+                <div class="button-group">
+                    <button class="text-button" onclick="openPage('app-settings.html')">
+                        <span data-i18n="generalSettings">General Settings</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="text-button" onclick="openPage('docs.html')">
+                        <span data-i18n="documentation">Documentation</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="text-button" onclick="openPage('about.html')">
+                        <span data-i18n="aboutApplication">About Application</span> <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2 class="section-title" data-i18n="notifications"><i class="fas fa-bell"></i> Notifications</h2>
+                <div class="button-group">
+                    <div class="text-button">
+                        <span data-i18n="enableNotifications">Enable Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="text-button">
+                        <span data-i18n="soundAlerts">Sound Alerts</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="text-button">
+                        <span data-i18n="vibration">Vibration</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>AI Chat Assistant &copy; 2023. <span data-i18n="allRightsReserved">All rights reserved</span>.</p>
+            <p class="app-version">Version 2.1.0</p>
+        </footer>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function openPage(page) {
+            window.location.href = page;
+        }
+
+        // Add event listeners to all text buttons for better feedback
+        document.querySelectorAll('.text-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.backgroundColor = '#f5f7ff';
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 300);
+            });
+        });
+
+        // Update current language indicator
+        function updateLanguageIndicator() {
+            const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
+            const languageMap = {
+                'en': 'EN',
+                'my': 'MY',
+                'zh': 'CN',
+                'th': 'TH',
+                'ph': 'PH',
+                'ru': 'RU',
+                'arb': 'AR'
+            };
+            
+            const languageIndicator = document.getElementById('currentLanguage');
+            if (languageIndicator) {
+                languageIndicator.textContent = languageMap[savedLanguage] || 'EN';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLanguageIndicator();
+            
+            // Listen for language changes
+            window.addEventListener('storage', function(event) {
+                if (event.key === 'selectedLanguage') {
+                    updateLanguageIndicator();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .docs-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+            padding: 20px;
+        }
+
+        .docs-section {
+            margin-bottom: 30px;
+        }
+
+        .docs-section h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+        }
+
+        .docs-section h2 i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .docs-section p {
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        .feature-list {
+            list-style-type: none;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li i {
+            color: #4a6cf7;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Documentation</h1>
+        </header>
+
+        <div class="docs-card">
+            <div class="docs-section">
+                <h2><i class="fas fa-question-circle"></i> Getting Started</h2>
+                <p>Welcome to the AI Chat Assistant documentation. Here you'll find everything you need to know about using our application effectively.</p>
+            </div>
+
+            <div class="docs-section">
+                <h2><i class="fas fa-comments"></i> Using the Chat</h2>
+                <p>Our AI assistant can help you with a variety of tasks:</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Answer questions on various topics</li>
+                    <li><i class="fas fa-check"></i> Provide recommendations and suggestions</li>
+                    <li><i class="fas fa-check"></i> Help with research and information gathering</li>
+                    <li><i class="fas fa-check"></i> Assist with writing and content creation</li>
+                </ul>
+            </div>
+
+            <div class="docs-section">
+                <h2><i class="fas fa-microphone"></i> Voice Commands</h2>
+                <p>You can interact with the assistant using voice commands:</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Click the microphone icon to start voice input</li>
+                    <li><i class="fas fa-check"></i> Speak clearly and naturally</li>
+                    <li><i class="fas fa-check"></i> The assistant will respond to your voice queries</li>
+                </ul>
+            </div>
+
+            <div class="docs-section">
+                <h2><i class="fas fa-image"></i> Image Uploads</h2>
+                <p>You can upload images for the assistant to analyze:</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Click the upload icon to select images</li>
+                    <li><i class="fas fa-check"></i> Use the camera icon to take photos directly</li>
+                    <li><i class="fas fa-check"></i> The assistant can describe images and answer questions about them</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

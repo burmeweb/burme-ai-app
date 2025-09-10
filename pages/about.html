@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About - Burme Chat</title>
+<link rel="stylesheet" href="../css/about.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header.navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(5px);
+    }
+
+    header.navbar h1 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    header.navbar a {
+        text-decoration: none;
+        color: #3498db;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    main.about-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 30px 20px;
+    }
+
+    .about-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 12px;
+        padding: 25px 30px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    .about-card h2 {
+        margin-top: 0;
+        color: #333;
+        font-size: 24px;
+    }
+
+    .about-card p {
+        margin: 8px 0;
+        color: #555;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+        .about-card {
+            padding: 20px;
+        }
+
+        .about-card h2 {
+            font-size: 20px;
+        }
+
+        .about-card p {
+            font-size: 14px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+    <h1>About</h1>
+    <a href="mainchat.html"><i class="fas fa-arrow-left"></i> Back</a>
+</header>
+
+<main class="about-container">
+    <div class="about-card">
+        <h2>Burme Chat Project</h2>
+        <p><strong>Version:</strong> 1.0.0</p>
+        <p><strong>Developer:</strong> Wayne</p>
+        <p><strong>Contact:</strong> example@burmechat.com</p>
+        <p>This project is an AI-powered chat platform featuring voice input, image uploads, and multi-language support for enhanced communication.</p>
+    </div>
+</main>
+
+</body>
+</html>

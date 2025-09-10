@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Management - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .data-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .data-section {
+            padding: 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .data-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .data-item {
+            margin-bottom: 15px;
+        }
+
+        .data-item h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .data-item p {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #3b5bdb;
+        }
+
+        .button.delete {
+            background-color: #e53e3e;
+        }
+
+        .button.delete:hover {
+            background-color: #c53030;
+        }
+
+        .storage-info {
+            background-color: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .storage-bar {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .storage-used {
+            height: 100%;
+            background-color: #4a6cf7;
+            width: 65%;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .data-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Data Management</h1>
+        </header>
+
+        <div class="data-card">
+            <div class="data-section">
+                <h2 class="section-title"><i class="fas fa-database"></i> Storage Information</h2>
+                
+                <div class="storage-info">
+                    <p>You've used 2.1 GB of your 3.2 GB storage</p>
+                    <div class="storage-bar">
+                        <div class="storage-used"></div>
+                    </div>
+                    <p>65% of storage used</p>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h2 class="section-title"><i class="fas fa-history"></i> Chat History</h2>
+                
+                <div class="data-item">
+                    <h3>Conversation Data</h3>
+                    <p>Your chat history is stored to improve your experience</p>
+                    <button class="button">Download Chat History</button>
+                    <button class="button delete">Clear All Chats</button>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h2 class="section-title"><i class="fas fa-image"></i> Media Files</h2>
+                
+                <div class="data-item">
+                    <h3>Uploaded Images</h3>
+                    <p>Images you've shared in conversations</p>
+                    <button class="button">Manage Images</button>
+                </div>
+                
+                <div class="data-item">
+                    <h3>Voice Messages</h3>
+                    <p>Audio recordings from your conversations</p>
+                    <button class="button">Manage Audio Files</button>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h2 class="section-title"><i class="fas fa-user"></i> Account Data</h2>
+                
+                <div class="data-item">
+                    <h3>Personal Information</h3>
+                    <p>Your profile information and preferences</p>
+                    <button class="button">Export Account Data</button>
+                </div>
+                
+                <div class="data-item">
+                    <h3>Delete Account</h3>
+                    <p>Permanently delete your account and all associated data</p>
+                    <button class="button delete">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        // Add confirmation for delete actions
+        document.querySelectorAll('.button.delete').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Are you sure you want to proceed? This action cannot be undone.')) {
+                    alert('Action completed successfully.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

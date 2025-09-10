@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .security-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .security-section {
+            padding: 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .security-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .security-item {
+            margin-bottom: 20px;
+        }
+
+        .security-item h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .security-item h3 i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .security-item p {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .status.active {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status.inactive {
+            background-color: #fed7d7;
+            color: #742a2a;
+        }
+
+        .button {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #3b5bdb;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .security-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Security Settings</h1>
+        </header>
+
+        <div class="security-card">
+            <div class="security-section">
+                <h2 class="section-title"><i class="fas fa-lock"></i> Account Security</h2>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-shield-alt"></i> Two-Factor Authentication <span class="status inactive">Inactive</span></h3>
+                    <p>Add an extra layer of security to your account</p>
+                    <button class="button">Enable 2FA</button>
+                </div>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-key"></i> Password</h3>
+                    <p>Last changed 3 months ago</p>
+                    <button class="button">Change Password</button>
+                </div>
+            </div>
+
+            <div class="security-section">
+                <h2 class="section-title"><i class="fas fa-user-shield"></i> Privacy Settings</h2>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-eye"></i> Profile Visibility <span class="status active">Public</span></h3>
+                    <p>Control who can see your profile information</p>
+                    <button class="button">Adjust Visibility</button>
+                </div>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-comment-slash"></i> Message Requests</h3>
+                    <p>Control who can send you message requests</p>
+                    <button class="button">Manage Settings</button>
+                </div>
+            </div>
+
+            <div class="security-section">
+                <h2 class="section-title"><i class="fas fa-desktop"></i> Device Management</h2>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-mobile-alt"></i> Active Devices</h3>
+                    <p>Manage devices that are logged into your account</p>
+                    <button class="button">View Active Devices</button>
+                </div>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-history"></i> Login History</h3>
+                    <p>Review recent account activity</p>
+                    <button class="button">View Login History</button>
+                </div>
+            </div>
+
+            <div class="security-section">
+                <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Security Alerts</h2>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-bell"></i> Suspicious Activity Alerts <span class="status active">Enabled</span></h3>
+                    <p>Get notified about unusual account activity</p>
+                    <button class="button">Configure Alerts</button>
+                </div>
+                
+                <div class="security-item">
+                    <h3><i class="fas fa-envelope"></i> Email Notifications <span class="status active">Enabled</span></h3>
+                    <p>Receive security notifications via email</p>
+                    <button class="button">Manage Notifications</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings - AI Chat Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            color: #4a6cf7;
+        }
+
+        .back-button:hover {
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .settings-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .settings-section {
+            padding: 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #4a6cf7;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .toggle-label {
+            flex: 1;
+        }
+
+        .toggle-label h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .toggle-label p {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4a6cf7;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .settings-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Notification Settings</h1>
+        </header>
+
+        <div class="settings-card">
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-bell"></i> Notification Preferences</h2>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Push Notifications</h3>
+                        <p>Receive notifications when the app is closed</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Message Sounds</h3>
+                        <p>Play sound when receiving new messages</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Vibration</h3>
+                        <p>Vibrate when receiving notifications</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-envelope"></i> Email Notifications</h2>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Email Updates</h3>
+                        <p>Receive periodic email updates</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Promotional Emails</h3>
+                        <p>Receive emails about new features</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Reminders</h2>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Daily Reminders</h3>
+                        <p>Receive daily usage reminders</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <h3>Weekly Reports</h3>
+                        <p>Receive weekly activity reports</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
