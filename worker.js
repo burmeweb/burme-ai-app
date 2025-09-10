@@ -4,28 +4,6 @@ import { handleChat } from './api/chat.js';
 import { handleImage } from './api/image.js';
 import { handleCode } from './api/code.js';
 
-// Simple rate limiting
-const userRateLimit = new Map();
-
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const windowStart = now - 60000; // 1 minute window
-  
-  if (!userRateLimit.has(ip)) {
-    userRateLimit.set(ip, []);
-  }
-  
-  const requests = userRateLimit.get(ip).filter(time => time > windowStart);
-  userRateLimit.set(ip, requests);
-  
-  if (requests.length >= 10) { // 10 requests per minute
-    return false;
-  }
-  
-  requests.push(now);
-  return true;
-}
-
 export default {
   async fetch(request, env, ctx) {
     try {
