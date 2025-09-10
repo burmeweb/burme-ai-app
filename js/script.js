@@ -11,11 +11,10 @@ const uploadBtn = document.getElementById('uploadBtn');
 const voiceBtn = document.getElementById('voiceBtn');
 
 // Worker endpoint URLs
-const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev";
-const CHAT_API_ENDPOINT = `${WORKER_BASE_URL}/api/chat`;
-const IMAGE_API_ENDPOINT = `${WORKER_BASE_URL}/api/image`;
-const CODE_API_ENDPOINT = `${WORKER_BASE_URL}/api/code`;
-
+const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev/api/chat";
+const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev/api/image";
+const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev/api/coder";
+const CHAT_API_ENDPOINT = `${WORKER_BASE_URL}/worker`;
 // Toggle sidebar on mobile
 menuBtn.addEventListener('click', () => {
     sidebar.classList.toggle('active');
