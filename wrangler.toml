@@ -9,7 +9,7 @@ workers_dev = true
 # custom domain သုံးမယ်ဆို routes ထဲမှာ ထည့်
 
 [vars]
-APP_NAME = "Burme Mark AI"
+APP_NAME = "burmemark-worker"
 
 # Secrets ကို ဒီမှာမထည့်ပါ
 # ထည့်ချင်ရင် => wrangler secret put OPENAI_API_KEY
