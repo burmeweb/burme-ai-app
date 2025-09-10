@@ -1,6 +1,6 @@
 // worker.js
 // GitHub Pages endpoints
-const GITHUB_PAGES_BASE = "https://burmeweb.github.io/burme-ai-app";
+const GITHUB_PAGES_BASE = "https://github.com/burmeweb/burme-ai-app";
 
 export default {
   async fetch(request, env, ctx) {
@@ -24,13 +24,13 @@ export default {
       }
       
       // Route requests to appropriate handlers
-      if (path === '/api/chat') {
+      if (path === '../api/chat') {
         return handleChat(request, env, corsHeaders);
-      } else if (path === '/api/image') {
+      } else if (path === '../api/image') {
         return handleImage(request, env, corsHeaders);
-      } else if (path === '/api/code') {
+      } else if (path === '../api/code') {
         return handleCode(request, env, corsHeaders);
-      } else if (path === '/health') {
+      } else if (path === '../health') {
         return new Response(JSON.stringify({ 
           status: 'ok', 
           app: appName,
