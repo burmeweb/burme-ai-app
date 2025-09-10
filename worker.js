@@ -1,7 +1,6 @@
 // worker.js
-import { handleChat } from 'https://raw.githubusercontent.com/burmeweb/burme-ai-app/main/api/chat.js';
-import { handleImage } from 'https://raw.githubusercontent.com/burmeweb/burme-ai-app/main/api/image.js';
-import { handleCode } from 'https://raw.githubusercontent.com/burmeweb/burme-ai-app/main/api/code.js';
+// GitHub Pages endpoints
+const GITHUB_PAGES_BASE = "https://burmeweb.github.io/burme-ai-app";
 
 export default {
   async fetch(request, env, ctx) {
@@ -10,7 +9,6 @@ export default {
       
       const url = new URL(request.url);
       const path = url.pathname;
-      const origin = request.headers.get('Origin') || '';
       
       // CORS headers
       const corsHeaders = {
@@ -64,8 +62,7 @@ export default {
     } catch (error) {
       return new Response(JSON.stringify({ 
         error: "Internal server error",
-        message: error.message,
-        stack: env.NODE_ENV === 'development' ? error.stack : undefined
+        message: error.message
       }), { 
         status: 500,
         headers: { 
@@ -77,23 +74,33 @@ export default {
   }
 }
 
-// Fallback handlers if GitHub import fails
+// Fetch handler functions from GitHub Pages
+async function fetchHandler(handlerName) {
+  try {
+    const response = await fetch(`${GITHUB_PAGES_BASE}/api/${handlerName}.js`);
+    if (response.ok) {
+      const handlerCode = await response.text();
+      return new Function('return ' + handlerCode)();
+    }
+  } catch (error) {
+    console.error(`Failed to fetch ${handlerName} handler:`, error);
+  }
+  return null;
+}
+
+// Handler functions with fallback
 async function handleChat(request, env, corsHeaders = {}) {
   try {
+    const chatHandler = await fetchHandler('chat');
+    if (chatHandler) {
+      return chatHandler(request, env, corsHeaders);
+    }
+    
+    // Fallback implementation
     const { message } = await request.json();
     
-    // Simple AI response logic
-    const responses = [
-      `Hello! You said: "${message}". How can I help you with this?`,
-      `I understand you're asking about: "${message}". Could you provide more details?`,
-      `Thank you for your message: "${message}". I'll do my best to assist you.`,
-      `I've received your query about "${message}". Let me think about that...`
-    ];
-    
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
     return new Response(JSON.stringify({
-      response: randomResponse,
+      response: `မင်္ဂလာပါ! သင့်ရဲ့စကား: "${message}"`,
       app: env.APP_NAME || "Burme Mark AI",
       timestamp: new Date().toISOString()
     }), {
@@ -108,7 +115,7 @@ async function handleChat(request, env, corsHeaders = {}) {
       error: "Failed to process chat request",
       message: error.message
     }), {
-      status: 400,
+      status: 500,
       headers: { 
         'Content-Type': 'application/json',
         ...corsHeaders
@@ -119,14 +126,17 @@ async function handleChat(request, env, corsHeaders = {}) {
 
 async function handleImage(request, env, corsHeaders = {}) {
   try {
-    const { prompt } = await request.json();
+    const imageHandler = await fetchHandler('image');
+    if (imageHandler) {
+      return imageHandler(request, env, corsHeaders);
+    }
     
-    // Simple image generation response
-    // In a real implementation, you would integrate with an image generation API
+    // Fallback implementation
+    const { prompt } = await request.json();
     const imageId = Math.random().toString(36).substring(2, 15);
     
     return new Response(JSON.stringify({
-      image_url: `https://placehold.co/600x400/0088cc/white?text=${encodeURIComponent(prompt)}`,
+      image_url: `https://placehold.co/512x512/0088cc/white?text=${encodeURIComponent(prompt)}`,
       prompt: prompt,
       image_id: imageId,
       app: env.APP_NAME || "Burme Mark AI",
@@ -142,7 +152,7 @@ async function handleImage(request, env, corsHeaders = {}) {
       error: "Failed to process image request",
       message: error.message
     }), {
-      status: 400,
+      status: 500,
       headers: { 
         'Content-Type': 'application/json',
         ...corsHeaders
@@ -153,18 +163,20 @@ async function handleImage(request, env, corsHeaders = {}) {
 
 async function handleCode(request, env, corsHeaders = {}) {
   try {
+    const codeHandler = await fetchHandler('code');
+    if (codeHandler) {
+      return codeHandler(request, env, corsHeaders);
+    }
+    
+    // Fallback implementation
     const { prompt } = await request.json();
     
-    // Simple code generation response
-    // In a real implementation, you would integrate with a code generation API
     const codeExamples = {
-      javascript: `// ${prompt}\nfunction solution() {\n  // Your code here\n  return "Hello, World!";\n}`,
-      python: `# ${prompt}\ndef solution():\n    # Your code here\n    return "Hello, World!"`,
-      html: `<!-- ${prompt} -->\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Solution</title>\n</head>\n<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>`
+      javascript: `// ${prompt}\nfunction solution() {\n  return "Hello, World!";\n}`,
+      python: `# ${prompt}\ndef solution():\n    return "Hello, World!"`
     };
     
-    const languages = Object.keys(codeExamples);
-    const randomLanguage = languages[Math.floor(Math.random() * languages.length)];
+    const randomLanguage = Math.random() > 0.5 ? 'javascript' : 'python';
     
     return new Response(JSON.stringify({
       code: codeExamples[randomLanguage],
@@ -183,11 +195,11 @@ async function handleCode(request, env, corsHeaders = {}) {
       error: "Failed to process code request",
       message: error.message
     }), {
-      status: 400,
+      status: 500,
       headers: { 
         'Content-Type': 'application/json',
         ...corsHeaders
       }
     });
   }
-      }
+}
