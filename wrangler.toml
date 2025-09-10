@@ -1,20 +1,16 @@
-# wrangler.toml
-name = 'burmemark-worker'
-compatibility_date = "2024-05-01"
-compatibility_flags = ["nodejs_compat"]
-main = "src/index.js"
+name = "burmemark-worker"
+main = "worker.js"
+compatibility_date = "2024-09-01"
 
-# Routes configuration
-[[routes]]
-pattern = "burmemark-worker.mysvm.workers.dev/*"
-custom_domain = true
+# workers.dev အောက်မှာ default URL ရမယ်
+workers_dev = true
+
+# frontend GitHub Pages က fetch ခေါ်မယ်ဆိုတော့ route မသတ်မှတ်လည်းရ
+# custom domain သုံးမယ်ဆို routes ထဲမှာ ထည့်
 
 [vars]
-OPENAI_API_KEY = "@openai_api_key"
-STABILITY_API_KEY = "@stability_api_key"
+APP_NAME = "BurmeMark AI"
 
-[env.production]
-vars = { ENVIRONMENT = "production" }
-
-[env.staging]
-vars = { ENVIRONMENT = "staging" }
+# Secrets ကို ဒီမှာမထည့်ပါ
+# ထည့်ချင်ရင် => wrangler secret put OPENAI_API_KEY
+#                wrangler secret put STABILITY_KEY
