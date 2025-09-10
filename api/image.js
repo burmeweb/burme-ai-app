@@ -1,7 +1,16 @@
 // api/image.js
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 export async function handleImage(request, env, corsHeaders = {}) {
   try {
-    // Check if request method is POST
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({
         error: "Method not allowed",
@@ -15,7 +24,7 @@ export async function handleImage(request, env, corsHeaders = {}) {
       });
     }
 
-    const { prompt, size = "512x512", style = "digital" } = await request.json();
+    const { prompt } = await request.json();
     
     if (!prompt) {
       return new Response(JSON.stringify({
@@ -30,52 +39,71 @@ export async function handleImage(request, env, corsHeaders = {}) {
       });
     }
 
-    // Generate a unique image ID
-    const imageId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    
-    // Different placeholder services based on style
-    let imageUrl;
-    const encodedPrompt = encodeURIComponent(prompt);
-    
-    switch(style) {
-      case "artistic":
-        imageUrl = `https://placehold.co/${size}/FF6B6B/white?text=${encodedPrompt}`;
-        break;
-      case "realistic":
-        imageUrl = `https://placehold.co/${size}/74B3CE/white?text=${encodedPrompt}`;
-        break;
-      case "anime":
-        imageUrl = `https://placehold.co/${size}/FF9A76/white?text=${encodedPrompt}`;
-        break;
-      default:
-        imageUrl = `https://placehold.co/${size}/0088CC/white?text=${encodedPrompt}`;
-    }
+    // Try Stability AI API first
+    try {
+      const stabilityResponse = await fetch('https://api.stability.ai/v2beta/stable-image/generate/core', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.STABILITY_KEY}`,
+          'Accept': 'image/*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          output_format: 'png',
+        })
+      });
 
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return new Response(JSON.stringify({
-      image_url: imageUrl,
-      prompt: prompt,
-      image_id: imageId,
-      size: size,
-      style: style,
-      app: env.APP_NAME || "Burme Mark AI",
-      timestamp: new Date().toISOString(),
-      download_url: `${imageUrl}&download=1`,
-      tips: "In production, this would integrate with real image generation APIs like DALL-E, Stable Diffusion, or Midjourney"
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        ...corsHeaders
+      if (stabilityResponse.status === 429) {
+        throw new Error('Stability AI rate limit exceeded');
       }
-    });
+
+      if (!stabilityResponse.ok) {
+        const errorText = await stabilityResponse.text();
+        throw new Error(`Stability AI API error: ${stabilityResponse.status} - ${errorText}`);
+      }
+
+      const imageBuffer = await stabilityResponse.arrayBuffer();
+      const base64Image = arrayBufferToBase64(imageBuffer);
+      
+      return new Response(JSON.stringify({
+        image_url: `data:image/png;base64,${base64Image}`,
+        prompt: prompt,
+        image_id: Math.random().toString(36).substring(2, 15),
+        app: env.APP_NAME || "Burme Mark AI",
+        timestamp: new Date().toISOString(),
+        source: 'stability_ai'
+      }), {
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+
+    } catch (stabilityError) {
+      // Fallback to placeholder image
+      console.log('Stability AI failed, using fallback:', stabilityError.message);
+      
+      return new Response(JSON.stringify({
+        image_url: `https://placehold.co/512x512/0088cc/white?text=${encodeURIComponent(prompt.substring(0, 50))}`,
+        prompt: prompt,
+        image_id: Math.random().toString(36).substring(2, 15),
+        app: env.APP_NAME || "Burme Mark AI",
+        timestamp: new Date().toISOString(),
+        source: 'fallback',
+        note: 'Using placeholder image due to API limitations'
+      }), {
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+    }
   } catch (error) {
+    console.error('Image generation error:', error);
     return new Response(JSON.stringify({
       error: "Failed to process image request",
-      message: error.message,
-      stack: env.NODE_ENV === 'development' ? error.stack : undefined
+      message: error.message
     }), {
       status: 500,
       headers: {
@@ -84,4 +112,4 @@ export async function handleImage(request, env, corsHeaders = {}) {
       }
     });
   }
-          }
+}
