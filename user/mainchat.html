@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar with left menu button -->
+        <nav class="navbar">
+            <button class="menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>AI Chat Assistant</h1>
+        </nav>
+
+        <!-- Main content area -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+                
+                <div class="recent-chats">
+                    <h3>Recent Chats</h3>
+                    <ul class="chat-list" id="chatList">
+                        <li class="chat-item">Project Discussion</li>
+                        <li class="chat-item active">Technical Support</li>
+                        <li class="chat-item">Learning Python</li>
+                        <li class="chat-item">Travel Planning</li>
+                    </ul>
+                </div>
+                
+                <div class="clear-conversations">
+                    <button id="clearBtn">
+                        <i class="fas fa-trash"></i> Clear Conversations
+                    </button>
+                </div>
+                
+                <div class="menu-footer">
+                    <div class="user-info" onclick="window.location.href='../pages/profile.html'">
+                        <div class="user-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <span>username@example.com</span>
+                    </div>
+                    <button class="settings-btn" onclick="window.location.href='../pages/setting.html'">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Chat area -->
+            <div class="chat-container">
+                <div class="chat-box" id="chatBox">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-container">
+                        <button class="upload-btn" id="uploadBtn">
+                            <i class="fas fa-upload"></i>
+                        </button>
+                        <div class="text-input-wrapper">
+                            <input type="text" id="messageInput" placeholder="Type a message...">
+                            <button class="voice-btn" id="voiceBtn">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                        <button class="send-btn" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../worker/worker.js"></script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
