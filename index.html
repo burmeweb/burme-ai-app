@@ -1,154 +1,318 @@
-<!doctype html>
-<html lang="my">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Burme Mark - AI-Powered Toolbox</title>
-  <style>
-    /* Custom advanced styles */
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #10b981;
-      --dark: #1f2937;
-      --light: #f9fafb;
-      --accent: #f59e0b;
-    }
-    
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      color: var(--light);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      background-attachment: fixed;
-    }
-    
-    .page-bg {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    
-    .center-card {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      max-width: 500px;
-      width: 100%;
-      animation: fadeIn 0.8s ease-out;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 20px;
-      animation: float 6s ease-in-out infinite;
-      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
-    }
-    
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin: 0 0 15px 0;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 30px;
-      line-height: 1.6;
-      color: rgba(255, 255, 255, 0.9);
-    }
-    
-    .links {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 25px;
-    }
-    
-    .links a {
-      display: block;
-      padding: 15px 25px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      text-decoration: none;
-      border-radius: 12px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .links a:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: 0.5s;
-    }
-    
-    .links a:hover:before {
-      left: 100%;
-    }
-    
-    .links a:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Responsive design */
-    @media (max-width: 600px) {
-      .center-card {
-        padding: 30px 20px;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      p {
-        font-size: 1rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cube Loader with Redirect</title>
+    <style>
+        :root {
+            --primary: #7E57C2;
+            --primary-light: #B39DDB;
+            --primary-dark: #5E35B1;
+            --secondary: #26A69A;
+            --text-primary: #2D3748;
+            --text-secondary: #718096;
+            --bg-light: #F7FAFC;
+            --bg-lighter: #FFFFFF;
+            --border-light: #E2E8F0;
+            --success: #48BB78;
+            --warning: #ECC94B;
+            --error: #F56565;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary), var(--primary-dark));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--bg-lighter);
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--bg-lighter);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            color: var(--text-primary);
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+        }
+        
+        .subtitle {
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        
+        .loader-card {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        
+        .loader-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .loader-card h3 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        
+        .loader-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        
+        /* Cube Loader Styles */
+        .cube-loader {
+            width: 50px;
+            height: 50px;
+            position: relative;
+            transform: rotateZ(45deg);
+        }
+        
+        .cube-loader .cube {
+            float: left;
+            width: 50%;
+            height: 50%;
+            position: relative;
+            transform: scale(1.1);
+        }
+        
+        .cube-loader .cube:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            animation: fold 2.4s infinite linear both;
+            transform-origin: 100% 100%;
+        }
+        
+        .cube-loader .cube2 {
+            transform: scale(1.1) rotateZ(90deg);
+        }
+        
+        .cube-loader .cube3 {
+            transform: scale(1.1) rotateZ(270deg);
+        }
+        
+        .cube-loader .cube4 {
+            transform: scale(1.1) rotateZ(180deg);
+        }
+        
+        .cube-loader .cube2:before {
+            animation-delay: 0.3s;
+            background-color: var(--primary-light);
+        }
+        
+        .cube-loader .cube3:before {
+            animation-delay: 0.6s;
+            background-color: var(--secondary);
+        }
+        
+        .cube-loader .cube4:before {
+            animation-delay: 0.9s;
+            background-color: var(--primary-dark);
+        }
+        
+        @keyframes fold {
+            0%, 10% {
+                transform: perspective(140px) rotateX(-180deg);
+                opacity: 0;
+            }
+            25%, 75% {
+                transform: perspective(140px) rotateX(0deg);
+                opacity: 1;
+            }
+            90%, 100% {
+                transform: perspective(140px) rotateY(180deg);
+                opacity: 0;
+            }
+        }
+        
+        .code-snippet {
+            display: none;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            border: 1px solid var(--border-light);
+        }
+        
+        .redirect-info {
+            margin-top: 30px;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+        
+        .countdown {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .manual-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: var(--bg-lighter);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+        
+        .manual-link:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--bg-lighter);
+            opacity: 0.9;
+        }
+
+        .code-keyword {
+            color: var(--primary-dark);
+            font-weight: bold;
+        }
+
+        .code-selector {
+            color: var(--secondary);
+        }
+
+        .code-value {
+            color: var(--primary);
+        }
+
+        .code-comment {
+            color: var(--text-secondary);
+        }
+    </style>
 </head>
-<body class="page-bg">
-  <main class="center-card">
-    <img src="assets/logo.png" alt="Burme Mark" class="logo"/>
-    <h1>Burme Mark</h1>
-    <p>AI-powered toolbox — Chat, Text Gen, Image Gen, Code Gen.</p>
-      <nav class="links">
-      <a href="public/chat.html"> Start </a>
-      </nav>
-  </main>
+<body>
+    <div class="container">
+        <h1> Burme Ai</h1>
+        <p class="subtitle"> deployment by Aung Myo Kyaw animation with auto- MyanmarGPT  Nay Pyi Taw </p>
+        
+        <div class="loader-card" onclick="showCode()">
+            <h3> Ai Assistant  </h3>
+            <div class="loader-preview">
+                <div class="cube-loader">
+                    <div class="cube cube1"></div>
+                    <div class="cube cube2"></div>
+                    <div class="cube cube3"></div>
+                    <div class="cube cube4"></div>
+                </div>
+            </div>
+            <div class="code-snippet" id="codeSnippet">
+<span class="code-comment">/* CSS for Cube Loader */</span>
+<span class="code-selector">.cube-loader</span> {
+    <span class="code-keyword">width</span>: <span class="code-value">50px</span>;
+    <span class="code-keyword">height</span>: <span class="code-value">50px</span>;
+    <span class="code-keyword">position</span>: <span class="code-value">relative</span>;
+    <span class="code-keyword">transform</span>: <span class="code-value">rotateZ(45deg)</span>;
+}
+
+<span class="code-selector">.cube-loader .cube</span> {
+    <span class="code-keyword">float</span>: <span class="code-value">left</span>;
+    <span class="code-keyword">width</span>: <span class="code-value">50%</span>;
+    <span class="code-keyword">height</span>: <span class="code-value">50%</span>;
+    <span class="code-keyword">position</span>: <span class="code-value">relative</span>;
+    <span class="code-keyword">transform</span>: <span class="code-value">scale(1.1)</span>;
+}
+
+<span class="code-selector">.cube-loader .cube:before</span> {
+    <span class="code-keyword">content</span>: <span class="code-value">''</span>;
+    <span class="code-keyword">position</span>: <span class="code-value">absolute</span>;
+    <span class="code-keyword">top</span>: <span class="code-value">0</span>;
+    <span class="code-keyword">left</span>: <span class="code-value">0</span>;
+    <span class="code-keyword">width</span>: <span class="code-value">100%</span>;
+    <span class="code-keyword">height</span>: <span class="code-value">100%</span>;
+    <span class="code-keyword">background-color</span>: <span class="code-value">var(--primary)</span>;
+    <span class="code-keyword">animation</span>: <span class="code-value">fold 2.4s infinite linear both</span>;
+    <span class="code-keyword">transform-origin</span>: <span class="code-value">100% 100%</span>;
+}
+            </div>
+        </div>
+        
+        <div class="redirect-info">
+            <p>You will be automatically redirected to the login page in <span class="countdown" id="countdown">3</span> seconds.</p>
+            <a href="../user/login.html" class="manual-link">Click here to go now</a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Burme AI Assistant  &copy; 2023</p>
+    </footer>
+
+    <script>
+        // Countdown and redirect functionality
+        let seconds = 3;
+        const countdownElement = document.getElementById('countdown');
+        
+        const countdownInterval = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = '../user/login.html';
+            }
+        }, 1000);
+        
+        // Show code snippet when the card is clicked
+        function showCode() {
+            const codeSnippet = document.getElementById('codeSnippet');
+            if (codeSnippet.style.display === 'block') {
+                codeSnippet.style.display = 'none';
+            } else {
+                codeSnippet.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
