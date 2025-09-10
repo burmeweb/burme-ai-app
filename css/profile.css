@@ -1,0 +1,117 @@
+/* -------------------- General -------------------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+}
+
+body.dark-theme {
+    background: #1e1e1e;
+    color: #f1f1f1;
+}
+
+/* -------------------- Navbar -------------------- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+body.dark-theme .navbar {
+    background: rgba(30,30,30,0.9);
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #3498db;
+    font-weight: 600;
+}
+
+.navbar a:hover {
+    color: #2980b9;
+}
+
+/* -------------------- Profile Container -------------------- */
+.profile-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+body.dark-theme .profile-container {
+    background: #2c2c2c;
+}
+
+/* -------------------- Form -------------------- */
+.profile-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-container label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.profile-container input {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.profile-container input:focus {
+    border-color: #3498db;
+}
+
+body.dark-theme .profile-container input {
+    border-color: #444;
+    background: #3c3c3c;
+    color: #f1f1f1;
+}
+
+/* -------------------- Buttons -------------------- */
+.profile-container button {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #3498db;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.profile-container button:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+/* -------------------- Responsive -------------------- */
+@media (max-width: 768px) {
+    .profile-container {
+        margin: 15px;
+        padding: 15px;
+    }
+
+    .profile-container input, .profile-container button {
+        font-size: 14px;
+    }
+}
