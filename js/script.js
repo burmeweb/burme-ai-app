@@ -10,11 +10,12 @@ const sendBtn = document.getElementById('sendBtn');
 const uploadBtn = document.getElementById('uploadBtn');
 const voiceBtn = document.getElementById('voiceBtn');
 
-// Worker endpoint URLs
-const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev/api/chat";
-const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev/api/image";
-const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev/api/coder";
-const CHAT_API_ENDPOINT = `${WORKER_BASE_URL}/worker`;
+// Worker endpoint URLs - တစ်ခုတည်းသော BASE_URL ကိုပဲသုံးပါ
+const WORKER_BASE_URL = "https://burmemark-worker.mysvm.workers.dev";
+const CHAT_API_ENDPOINT = `${WORKER_BASE_URL}/chat`;
+const IMAGE_API_ENDPOINT = `${WORKER_BASE_URL}/generate-image`;
+const ASSISTANT_API_ENDPOINT = `${WORKER_BASE_URL}/assistants/chat`;
+
 // Toggle sidebar on mobile
 menuBtn.addEventListener('click', () => {
     sidebar.classList.toggle('active');
@@ -94,19 +95,7 @@ async function sendMessage() {
         }
         
         // Show typing indicator
-        const typingIndicator = document.createElement('div');
-        typingIndicator.className = 'message assistant typing';
-        typingIndicator.innerHTML = `
-            <div class="message-content">
-                <div class="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        `;
-        chatBox.appendChild(typingIndicator);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        const typingIndicator = addTypingIndicator();
         
         try {
             // Call the external API for AI response
@@ -118,22 +107,51 @@ async function sendMessage() {
                 body: JSON.stringify({ message: message })
             });
             
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             // Remove typing indicator
-            chatBox.removeChild(typingIndicator);
+            removeTypingIndicator(typingIndicator);
             
             // Add AI response
-            addMessage('assistant', data.response || data.message || "I'm sorry, I couldn't process your request.");
+            addMessage('assistant', data.response || data.message || data.error || "I'm sorry, I couldn't process your request.");
         } catch (error) {
             console.error('Error fetching AI response:', error);
             
             // Remove typing indicator
-            chatBox.removeChild(typingIndicator);
+            removeTypingIndicator(typingIndicator);
             
             // Add error message
             addMessage('assistant', "I'm having trouble connecting to the server. Please try again later.");
         }
+    }
+}
+
+// Add typing indicator
+function addTypingIndicator() {
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'message assistant typing';
+    typingIndicator.innerHTML = `
+        <div class="message-content">
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    `;
+    chatBox.appendChild(typingIndicator);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return typingIndicator;
+}
+
+// Remove typing indicator
+function removeTypingIndicator(typingIndicator) {
+    if (typingIndicator && typingIndicator.parentNode) {
+        chatBox.removeChild(typingIndicator);
     }
 }
 
@@ -145,13 +163,18 @@ function addMessage(sender, text) {
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
-    // Check if text contains image URL (simple check)
+    // Check if text contains image data URL
     let contentHtml = text;
-    if (text.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+    if (text.startsWith('data:image/')) {
         contentHtml = `<img src="${text}" alt="Generated image" style="max-width: 100%; border-radius: 8px; margin-top: 8px;">`;
     } else if (text.includes('```')) {
         // Format code blocks with syntax highlighting
         contentHtml = formatCodeBlocks(text);
+    } else {
+        // Convert URLs to clickable links
+        contentHtml = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        // Convert line breaks to <br>
+        contentHtml = contentHtml.replace(/\n/g, '<br>');
     }
     
     messageElement.innerHTML = `
@@ -226,17 +249,8 @@ async function generateImage(prompt) {
     if (!prompt) return;
     
     // Show typing indicator for image generation
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'message assistant typing';
-    typingIndicator.innerHTML = `
-        <div class="message-content">
-            <div class="typing-indicator">
-                <span>Generating image...</span>
-            </div>
-        </div>
-    `;
-    chatBox.appendChild(typingIndicator);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    const typingIndicator = addTypingIndicator();
+    typingIndicator.querySelector('.typing-indicator').innerHTML = '<span>Generating image...</span>';
     
     try {
         // Call the image generation API
@@ -245,74 +259,78 @@ async function generateImage(prompt) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ prompt: prompt })
+            body: JSON.stringify({ prompt: prompt, output_format: "webp" })
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         
         // Remove typing indicator
-        chatBox.removeChild(typingIndicator);
+        removeTypingIndicator(typingIndicator);
         
         // Add image response
-        if (data.image_url) {
+        if (data.image) {
+            addMessage('assistant', data.image);
+        } else if (data.image_url) {
             addMessage('assistant', data.image_url);
         } else {
-            addMessage('assistant', data.message || "I couldn't generate an image for that prompt.");
+            addMessage('assistant', data.message || data.error || "I couldn't generate an image for that prompt.");
         }
     } catch (error) {
         console.error('Error generating image:', error);
         
         // Remove typing indicator
-        chatBox.removeChild(typingIndicator);
+        removeTypingIndicator(typingIndicator);
         
         // Add error message
         addMessage('assistant', "I'm having trouble connecting to the image generation service.");
     }
 }
 
-// Generate code from text
+// Generate code from text - Using assistant endpoint for code generation
 async function generateCode(prompt) {
     if (!prompt) return;
     
     // Show typing indicator for code generation
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'message assistant typing';
-    typingIndicator.innerHTML = `
-        <div class="message-content">
-            <div class="typing-indicator">
-                <span>Generating code...</span>
-            </div>
-        </div>
-    `;
-    chatBox.appendChild(typingIndicator);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    const typingIndicator = addTypingIndicator();
+    typingIndicator.querySelector('.typing-indicator').innerHTML = '<span>Generating code...</span>';
     
     try {
-        // Call the code generation API
-        const response = await fetch(CODE_API_ENDPOINT, {
+        // Use assistant endpoint for code generation
+        const response = await fetch(ASSISTANT_API_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ prompt: prompt })
+            body: JSON.stringify({ 
+                message: `Please generate code for: ${prompt}. Provide the code in a code block.`,
+                assistant_id: "math-tutor" // You can change this to your preferred assistant ID
+            })
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         
         // Remove typing indicator
-        chatBox.removeChild(typingIndicator);
+        removeTypingIndicator(typingIndicator);
         
         // Add code response
-        if (data.code || data.response) {
-            addMessage('assistant', data.code || data.response);
+        if (data.response) {
+            addMessage('assistant', data.response);
         } else {
-            addMessage('assistant', data.message || "I couldn't generate code for that prompt.");
+            addMessage('assistant', data.message || data.error || "I couldn't generate code for that prompt.");
         }
     } catch (error) {
         console.error('Error generating code:', error);
         
         // Remove typing indicator
-        chatBox.removeChild(typingIndicator);
+        removeTypingIndicator(typingIndicator);
         
         // Add error message
         addMessage('assistant', "I'm having trouble connecting to the code generation service.");
@@ -323,7 +341,8 @@ async function generateCode(prompt) {
 sendBtn.addEventListener('click', sendMessage);
 
 messageInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         sendMessage();
     }
 });
@@ -341,14 +360,21 @@ uploadBtn.addEventListener('click', () => {
             reader.onload = (event) => {
                 const content = event.target.result;
                 if (file.type.startsWith('image/')) {
-                    // For images, you might want to display or process them
-                    alert(`Image "${file.name}" selected. Image processing would be implemented here.`);
+                    // For images, display them
+                    addMessage('user', `Uploaded image: ${file.name}`);
+                    addMessage('assistant', `I see you uploaded an image. How would you like me to help with this image?`);
                 } else {
-                    // For text files, you can send the content as a message
-                    messageInput.value = `/code Please analyze this ${file.name} file:\n\n${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}`;
+                    // For text files, send as message
+                    const truncatedContent = content.length > 1000 ? content.substring(0, 1000) + '...' : content;
+                    messageInput.value = `Please analyze this ${file.name} file:\n\n${truncatedContent}`;
                 }
             };
-            reader.readAsText(file);
+            
+            if (file.type.startsWith('image/')) {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsText(file);
+            }
         }
     };
     
@@ -372,16 +398,18 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     
     recognition.onerror = (event) => {
         console.error('Speech recognition error', event.error);
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        voiceBtn.style.color = '';
-        isListening = false;
+        updateVoiceButton(false);
     };
     
     recognition.onend = () => {
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        voiceBtn.style.color = '';
-        isListening = false;
+        updateVoiceButton(false);
     };
+}
+
+function updateVoiceButton(listening) {
+    isListening = listening;
+    voiceBtn.innerHTML = listening ? '<i class="fas fa-stop"></i>' : '<i class="fas fa-microphone"></i>';
+    voiceBtn.style.color = listening ? 'var(--error)' : '';
 }
 
 voiceBtn.addEventListener('click', () => {
@@ -391,15 +419,11 @@ voiceBtn.addEventListener('click', () => {
     }
     
     if (!isListening) {
-        isListening = true;
-        voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
-        voiceBtn.style.color = 'var(--error)';
         recognition.start();
+        updateVoiceButton(true);
     } else {
-        isListening = false;
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        voiceBtn.style.color = '';
         recognition.stop();
+        updateVoiceButton(false);
     }
 });
 
@@ -491,9 +515,41 @@ style.textContent = `
     .hljs {
         background: transparent !important;
     }
+    
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--text-secondary);
+        animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes typing {
+        0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+        40% { transform: scale(1); opacity: 1; }
+    }
+    
+    a {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+    
+    a:hover {
+        color: var(--primary-dark);
+    }
 `;
 
 document.head.appendChild(style);
 
 // Make functions available globally for onclick handlers
 window.copyCodeToClipboard = copyCodeToClipboard;
+window.sendMessage = sendMessage;
