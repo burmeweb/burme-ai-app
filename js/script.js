@@ -10,6 +10,9 @@ const sendBtn = document.getElementById('sendBtn');
 const uploadBtn = document.getElementById('uploadBtn');
 const voiceBtn = document.getElementById('voiceBtn');
 
+// Worker endpoint URL - ဤနေရာတွင် ပြင်ဆင်ပါ
+const WORKER_ENDPOINT = "https://burmemark-worker.mysvm.workers.dev";
+
 // Toggle sidebar on mobile
 menuBtn.addEventListener('click', () => {
     sidebar.classList.toggle('active');
@@ -88,7 +91,7 @@ async function sendMessage() {
         
         try {
             // Call the external API for AI response
-            const response = await fetch('https://burmemark-worker.mysvm.workers.dev', {
+            const response = await fetch(WORKER_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
