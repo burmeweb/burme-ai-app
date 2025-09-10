@@ -1,7 +1,6 @@
 // api/chat.js
 export async function handleChat(request, env, corsHeaders = {}) {
   try {
-    // Check if request method is POST
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({
         error: "Method not allowed",
@@ -15,7 +14,7 @@ export async function handleChat(request, env, corsHeaders = {}) {
       });
     }
 
-    const { message, conversation_history = [] } = await request.json();
+    const { message } = await request.json();
     
     if (!message) {
       return new Response(JSON.stringify({
@@ -30,48 +29,88 @@ export async function handleChat(request, env, corsHeaders = {}) {
       });
     }
 
-    // Simple AI response logic - in production, integrate with real AI API
-    const responses = [
-      `မင်္ဂလာပါ! သင့်ရဲ့စကားက "${message}"။ ဒီအကြောင်း ကူညီပေးနိုင်ဖို့ ဝမ်းသာပါတယ်။`,
-      `သင့်ရဲ့မေးခွန်း "${message}" ကို နားလည်ပါတယ်။ ပိုမိုသိရှိလိုပါက ထပ်မံမေးမြန်းနိုင်ပါတယ်။`,
-      `ကျေးဇူးတင်ပါတယ်! သင့်ရဲ့စကား "${message}" ကို လေ့လာပြီး အကောင်းဆုံးအဖြေပေးနိုင်ရန် ကြိုးစားပါမည်။`,
-      `အကြံဉာဏ်ကောင်းပါပဲ! "${message}" ဆိုတဲ့အကြောင်း စဉ်းစားကြည့်ရအောင်...`
-    ];
+    // Try OpenAI API first
+    try {
+      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful assistant that responds in Burmese language. Be friendly and helpful.'
+            },
+            {
+              role: 'user',
+              content: message
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
 
-    // Check for specific keywords to provide more relevant responses
-    let customResponse = '';
-    
-    if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi') || message.includes('မင်္ဂလာပါ')) {
-      customResponse = 'မင်္ဂလာပါ! Burme Mark AI မှ ကြိုဆိုပါတယ်။ ဘယ်လိုကူညီရမလဲ?';
-    } else if (message.toLowerCase().includes('weather') || message.includes('ရာသီဥတု')) {
-      customResponse = 'ရာသီဥတုအခြေအနေအတွက် ကျေးဇူးတင်ပါတယ်။ လက်ရှိမှာ ရန်ကုန်မြို့ရဲ့ ရာသီဥတုက 32°C နဲ့ တိမ်အနည်းငယ်ရှိနေပါတယ်။';
-    } else if (message.toLowerCase().includes('time') || message.includes('အချိန်')) {
-      const now = new Date();
-      customResponse = `လက်ရှိအချိန်က ${now.toLocaleTimeString()} ဖြစ်ပါတယ်။`;
-    } else if (message.toLowerCase().includes('name') || message.includes('နာမည်')) {
-      customResponse = 'ကျွန်တော့်နာမည်က Burme Mark AI ဖြစ်ပါတယ်။ သင့်ကို ကူညီရတာ ဝမ်းသာပါတယ်!';
-    }
-
-    const randomResponse = customResponse || responses[Math.floor(Math.random() * responses.length)];
-    
-    return new Response(JSON.stringify({
-      response: randomResponse,
-      app: env.APP_NAME || "Burme Mark AI",
-      timestamp: new Date().toISOString(),
-      message_length: message.length,
-      conversation_history: [...conversation_history, { role: 'user', content: message }]
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        ...corsHeaders
+      if (openaiResponse.status === 429) {
+        throw new Error('OpenAI rate limit exceeded');
       }
-    });
+
+      if (!openaiResponse.ok) {
+        const errorData = await openaiResponse.json();
+        throw new Error(`OpenAI API error: ${openaiResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
+      }
+
+      const openaiData = await openaiResponse.json();
+      const aiResponse = openaiData.choices[0].message.content;
+      
+      return new Response(JSON.stringify({
+        response: aiResponse,
+        app: env.APP_NAME || "Burme Mark AI",
+        timestamp: new Date().toISOString(),
+        source: 'openai'
+      }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+
+    } catch (openaiError) {
+      // Fallback to simple responses if OpenAI fails
+      console.log('OpenAI failed, using fallback:', openaiError.message);
+      
+      const responses = [
+        `မင်္ဂလာပါ! သင့်ရဲ့စကား: "${message}" ကို နားလည်ပါတယ်။ ပိုမိုကူညီနိုင်ရန် ကျေးဇူးပြု၍ ထပ်မံမေးမြန်းပေးပါ။`,
+        `ကျေးဇူးတင်ပါတယ်! သင့်ရဲ့စကား: "${message}" အတွက် ကူညီပေးနိုင်ရန် ကြိုးစားပါမည်။`,
+        `အကြံဉာဏ်ကောင်းပါပဲ! "${message}" ဆိုတဲ့အကြောင်း စဉ်းစားကြည့်ရအောင်...`,
+        `မင်္ဂလာပါ! Burme Mark AI မှ ကြိုဆိုပါတယ်။ "${message}" အတွက် ကူညီပေးနိုင်ပါတယ်။`,
+        `သင့်ရဲ့စကား: "${message}" ကို သိရတာ ဝမ်းသာပါတယ်။ ဘယ်လိုကူညီရမလဲ?`
+      ];
+
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      return new Response(JSON.stringify({
+        response: randomResponse,
+        app: env.APP_NAME || "Burme Mark AI",
+        timestamp: new Date().toISOString(),
+        source: 'fallback'
+      }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+    }
   } catch (error) {
+    console.error('Chat error:', error);
     return new Response(JSON.stringify({
       error: "Failed to process chat request",
-      message: error.message,
-      stack: env.NODE_ENV === 'development' ? error.stack : undefined
+      message: error.message
     }), {
       status: 500,
       headers: {
@@ -80,4 +119,4 @@ export async function handleChat(request, env, corsHeaders = {}) {
       }
     });
   }
-        }
+}
