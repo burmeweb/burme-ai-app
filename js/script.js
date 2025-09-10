@@ -43,7 +43,7 @@ newChatBtn.addEventListener('click', () => {
     messageInput.focus();
     
     // Show welcome message
-    addMessage('assistant', 'Hello! How can I assist you today? You can ask me anything, type "/image prompt" to generate images, or "/code prompt" to generate code.');
+    addMessage('assistant', 'Hello! How can I assist you today?');
 });
 
 // Clear conversations
@@ -167,6 +167,17 @@ function addMessage(sender, text) {
     
     chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Apply syntax highlighting if code blocks are present
+    if (text.includes('```')) {
+        setTimeout(() => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                if (typeof hljs !== 'undefined') {
+                    hljs.highlightBlock(block);
+                }
+            });
+        }, 100);
+    }
 }
 
 // Format code blocks with syntax highlighting
@@ -399,7 +410,7 @@ window.addEventListener('load', () => {
         addMessage('assistant', 'Hello! How can I assist you today? You can:\n- Ask me anything\n- Type "/image prompt" to generate images\n- Type "/code prompt" to generate code\n- Upload files for analysis');
     }, 500);
     
-    // Load highlight.js for code syntax highlighting
+    // Load highlight.js for code syntax highlighting if available
     if (typeof hljs !== 'undefined') {
         document.querySelectorAll('pre code').forEach((block) => {
             hljs.highlightBlock(block);
@@ -433,47 +444,57 @@ observer.observe(chatBox, { childList: true });
 const style = document.createElement('style');
 style.textContent = `
     .code-block {
-        background: var(--code-bg);
+        background: var(--code-bg, #f8f9fa);
         border-radius: 8px;
         margin: 8px 0;
         overflow: hidden;
+        border: 1px solid var(--border-color, #e9ecef);
     }
     
     .code-header {
-        background: var(--sidebar-bg);
+        background: var(--sidebar-bg, #2d3748);
         padding: 8px 12px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-size: 12px;
-        color: var(--text-secondary);
+        color: var(--text-secondary, #a0aec0);
     }
     
     .copy-code-btn {
-        background: var(--primary);
+        background: var(--primary, #4299e1);
         color: white;
         border: none;
         padding: 4px 8px;
         border-radius: 4px;
         cursor: pointer;
         font-size: 11px;
+        transition: background 0.2s;
     }
     
     .copy-code-btn:hover {
-        background: var(--primary-dark);
+        background: var(--primary-dark, #3182ce);
     }
     
     pre {
         margin: 0;
         padding: 12px;
         overflow-x: auto;
+        background: var(--code-bg, #f8f9fa);
     }
     
     code {
-        font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        font-family: 'Fira Code', 'Monaco', 'Consolas', 'Courier New', monospace;
         font-size: 14px;
         line-height: 1.4;
+    }
+    
+    .hljs {
+        background: transparent !important;
     }
 `;
 
 document.head.appendChild(style);
+
+// Make functions available globally for onclick handlers
+window.copyCodeToClipboard = copyCodeToClipboard;
